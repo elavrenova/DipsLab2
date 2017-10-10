@@ -10,7 +10,7 @@ namespace OrderService.Models
         public long Id { get; set; }
         public long UserId { get; set; }
         public long StockId { get; set; }
-        public int Weight { get; set; }
+        public double Weight { get; set; }
         public long TransferId { get; set; }
         public int Status { get; set; }
     }
