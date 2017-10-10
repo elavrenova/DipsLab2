@@ -9,7 +9,7 @@ using OrderService.Models;
 
 namespace OrderService.Controllers
 {
-    [Route("api/[order]")]
+    [Route("api/[controller]")]
     public class OrderController : Controller
     {
         private readonly OrderContext dbcontext;
@@ -39,6 +39,20 @@ namespace OrderService.Controllers
                 return NotFound();
             }
             return new ObjectResult(item);
+        }
+
+        [HttpPost]
+        public IActionResult Create([FromBody] Order item)
+        {
+            if (item == null)
+            {
+                return BadRequest();
+            }
+
+            dbcontext.Orders.Add(item);
+            dbcontext.SaveChanges();
+
+            return CreatedAtRoute("GetOrder", new { id = item.Id }, item);
         }
     }
 }
