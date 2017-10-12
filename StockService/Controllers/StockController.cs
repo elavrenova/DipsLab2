@@ -20,8 +20,6 @@ namespace StockService.Controllers
             if (dbcontext.Stocks.Count() == 0)
             {
                 dbcontext.Stocks.Add(new Stock { Name = "Stock1", FreePlace = 10000000.0});
-                dbcontext.Stocks.Add(new Stock { Name = "Stock2", FreePlace = 10000000.0 });
-                dbcontext.Stocks.Add(new Stock { Name = "Stock3", FreePlace = 20000000.0 });
                 dbcontext.SaveChanges();
             }
         }

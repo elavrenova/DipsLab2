@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 using StockService.Models;
+using System.Data.SqlClient;
 
 namespace StockService
 {
@@ -25,7 +26,13 @@ namespace StockService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<StockContext>(opt => opt.UseInMemoryDatabase("StocksList"));
+            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+            builder.DataSource = "stockdipsserver.database.windows.net";
+            builder.UserID = "lisoid";
+            builder.Password = "LiVVaILeA28";
+            builder.InitialCatalog = "StockDb";
+            string con = "Server=tcp:stockdipsserver.database.windows.net;Database=StockDb;Trusted_Connection=True;MultipleActiveResultSets=true";
+            services.AddDbContext<StockContext>(opt => opt.UseSqlServer(builder.ToString()));
             services.AddMvc();
         }
 
