@@ -14,5 +14,13 @@ namespace StockService.Models
         }
 
         public DbSet<Stock> Stocks { get; set; }
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+            builder.Entity<Stock>(stock =>
+            {
+                stock.HasKey(x => x.Id);
+            });
+        }
     }
 }

@@ -26,14 +26,9 @@ namespace StockService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
-            builder.DataSource = "stockdipsserver.database.windows.net";
-            builder.UserID = "lisoid";
-            builder.Password = "LiVVaILeA28";
-            builder.InitialCatalog = "StockDb";
-            string con = "Server=tcp:stockdipsserver.database.windows.net;Database=StockDb;Trusted_Connection=True;MultipleActiveResultSets=true";
-            services.AddDbContext<StockContext>(opt => opt.UseSqlServer(builder.ToString()));
+            services.AddDbContext<StockContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddMvc();
+            services.BuildServiceProvider().GetRequiredService<StockContext>().Database.Migrate();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

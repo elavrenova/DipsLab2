@@ -19,7 +19,7 @@ namespace StockService.Controllers
 
             if (dbcontext.Stocks.Count() == 0)
             {
-                dbcontext.Stocks.Add(new Stock { Name = "Stock1", FreePlace = 10000000.0});
+                dbcontext.Stocks.Add(new Stock { Name = "Stock1", FreePlace = 10000000.0 });
                 dbcontext.SaveChanges();
             }
         }
@@ -27,7 +27,7 @@ namespace StockService.Controllers
         [HttpGet]
         public IEnumerable<Stock> GetAll()
         {
-            return dbcontext.Stocks.ToList();
+            return dbcontext.Stocks;
         }
 
         [HttpGet("{id}", Name = "GetStock")]
