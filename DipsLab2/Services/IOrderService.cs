@@ -9,8 +9,7 @@ namespace DipsLab2.Services
 {
     public interface IOrderService
     {
-        Task<List<string>> GetInfoOrders(int page, int perpage);
         Task<HttpResponseMessage> AddOrder(OrderModel orderModel);
-        Task<HttpResponseMessage> UpdateOrderStatus(OrderModel orderModel);
+        Task<HttpResponseMessage> UpdateOrder(OrderModel orderModel);
     }
 }

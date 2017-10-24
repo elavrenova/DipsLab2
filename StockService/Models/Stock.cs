@@ -13,6 +13,11 @@ namespace StockService.Models
             this.Name = stockModel.Name;
             this.FreePlace = stockModel.FreePlace;
         }
+
+        public Stock()
+        {
+        }
+
         public long Id { get; set; }
         public string Name { get; set; }
         public double FreePlace { get; set; }

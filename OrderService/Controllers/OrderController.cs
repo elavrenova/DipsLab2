@@ -10,7 +10,7 @@ using OrderService.Models;
 
 namespace OrderService.Controllers
 {
-    [Route("api")]
+    [Route("")]
     public class OrderController : Controller
     {
         private readonly OrderContext dbcontext;
@@ -20,9 +20,19 @@ namespace OrderService.Controllers
         }
 
         [HttpGet("")]
-        public IEnumerable<Order> GetAll()
+        public async Task<List<string>> GetAllOrders([FromRoute]int page, int size)
         {
-            return dbcontext.Orders.ToList();
+            var orders = dbcontext.Orders.AsEnumerable<Order>();
+            if (size != 0 && page != 0)
+            {
+                orders = orders.Skip(size * page);
+            }
+            if (size != 0)
+            {
+                orders = orders.Take(size);
+            }
+            return orders.Select(n => $"UserId: {n.UserId}{Environment.NewLine}StockId: {n.StockId}{Environment.NewLine}Status: {n.Status}{Environment.NewLine}Value: {n.Value}{Environment.NewLine}TransferId: {n.TransferId}")
+                .ToList();
         }
 
         [HttpGet("{id}", Name = "GetOrder")]
@@ -36,8 +46,8 @@ namespace OrderService.Controllers
             return new ObjectResult(item);
         }
 
-        [HttpPost]
-        public IActionResult AddOrder([FromBody] OrderModel item)
+        [HttpPost("")]
+        public async Task<IActionResult> AddOrder(OrderModel item)
         {
             if (item == null)
             {
@@ -51,7 +61,7 @@ namespace OrderService.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(long id, [FromBody] OrderModel item)
+        public async Task<IActionResult> UpdateOrder(long id, OrderModel item)
         {
             if (item == null || item.Id != id)
             {

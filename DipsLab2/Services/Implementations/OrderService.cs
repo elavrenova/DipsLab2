@@ -13,30 +13,33 @@ namespace DipsLab2.Services.Implementations
     public class OrderService : Service, IOrderService
     {
         public OrderService(IConfiguration configuration) : 
-            base(configuration.GetSection("Addresses")["Accs"]) { }
+            base(configuration.GetSection("Urls")["Order"]) { }
 
-        public async Task<List<string>> GetInfoOrders(int page, int perpage)
-        {
-            var res = await Get($"?page={page}&perpage={perpage}");
-            string response = await res.Content.ReadAsStringAsync();
+        //public async Task<List<string>> GetAllOrders(int page, int perpage)
+        //{
+        //    var res = await Get($"?page={page}&perpage={perpage}");
+        //    string response = await res.Content.ReadAsStringAsync();
 
-            try
-            {
-                return JsonConvert.DeserializeObject<List<string>>(response);
-            }
-            catch
-            {
-                return null;
-            }
+        //    try
+        //    {
+        //        return JsonConvert.DeserializeObject<List<string>>(response);
+        //    }
+        //    catch
+        //    {
+        //        return null;
+        //    }
 
-        }
+        //}
 
         public async Task<HttpResponseMessage> AddOrder(OrderModel orderModel)
         {
             return await PostJson("", orderModel);
-        } 
+        }
 
-
+        public async Task<HttpResponseMessage> UpdateOrder(OrderModel orderModel)
+        {
+            return await PutJson("", orderModel);
+        }
 
     }
 }

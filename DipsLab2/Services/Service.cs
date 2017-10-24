@@ -28,26 +28,12 @@ namespace DipsLab2.Services
                     return null;
                 }
         }
-
-        protected async Task<HttpResponseMessage> PostForm(string addr, Dictionary<string, string> parameters)
+        protected async Task<HttpResponseMessage> PutJson(string addr, object obj)
         {
             using (var client = new HttpClient())
                 try
                 {
-                    return await client.PostAsync(GetAddress(addr), new FormUrlEncodedContent(parameters));
-                }
-                catch
-                {
-                    return null;
-                }
-        }
-
-        protected async Task<HttpResponseMessage> PutForm(string addr, Dictionary<string, string> parameters)
-        {
-            using (var client = new HttpClient())
-                try
-                {
-                    return await client.PutAsync(GetAddress(addr), new FormUrlEncodedContent(parameters));
+                    return await client.PutAsync(GetAddress(addr), new StringContent(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json"));
                 }
                 catch
                 {

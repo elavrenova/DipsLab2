@@ -10,7 +10,7 @@ using TransferService.Models;
 
 namespace TransferService.Controllers
 {
-    [Route("api")]
+    [Route("")]
     public class TransferController : Controller
     {
         private readonly TransferContext dbcontext;
@@ -21,9 +21,17 @@ namespace TransferService.Controllers
         }
 
         [HttpGet("")]
-        public List<string> GetAllTransfers([FromRoute] int page, int perpage)
+        public async Task<List<string>> GetAllTransfers([FromRoute] int page, int size)
         {
-            var transfers = dbcontext.Transfers;
+            var transfers = dbcontext.Transfers.AsEnumerable<Transfer>();
+            if (size != 0 && page != 0)
+            {
+                transfers = transfers.Skip(size * page);
+            }
+            if (size != 0)
+            {
+                transfers = transfers.Take(size);
+            }
             return transfers.Select(n => $"Name: {n.Name}{Environment.NewLine}Carrying: {n.Carrying}{Environment.NewLine}Status: {n.Status}")
                 .ToList();
         }
@@ -40,9 +48,9 @@ namespace TransferService.Controllers
         }
 
         [HttpPost("")]
-        public IActionResult AddTransfer([FromBody] TransferModel item)
+        public IActionResult AddTransfer(TransferModel item)
         {
-            var prevTransf = dbcontext.Transfers.FirstOrDefault(n => n.Name == item.Name);
+            var prevTransf = dbcontext.Transfers.FirstOrDefault(n => n.Name == item.Name && n.Carrying == item.Carrying);
             if (prevTransf == null)
             {
                 dbcontext.Transfers.Add(new Transfer(item)
@@ -58,8 +66,29 @@ namespace TransferService.Controllers
         }
 
 
-        [HttpPut("{id}")]
-        public IActionResult Update(long id, [FromBody] Transfer item)
+        [HttpPut("book_t/{id}")]
+        public async Task<IActionResult> BookTransfer(long id, TransferModel item)
+        {
+            if (item == null || item.Id != id)
+            {
+                return BadRequest();
+            }
+
+            var trans = dbcontext.Transfers.FirstOrDefault(t => t.Id == id);
+            if (trans == null)
+            {
+                return NotFound();
+            }
+            trans.Name = item.Name;
+            trans.Status = item.Status;
+
+            dbcontext.Transfers.Update(trans);
+            dbcontext.SaveChanges();
+            return new NoContentResult();
+        }
+
+        [HttpPut("refuse_t/{id}")]
+        public async Task<IActionResult> RefuseTransfer(long id, TransferModel item)
         {
             if (item == null || item.Id != id)
             {
@@ -72,8 +101,6 @@ namespace TransferService.Controllers
                 return NotFound();
             }
 
-            trans.Name = item.Name;
-            trans.Carrying = item.Carrying;
             trans.Status = item.Status;
 
             dbcontext.Transfers.Update(trans);

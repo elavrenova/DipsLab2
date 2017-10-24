@@ -17,6 +17,11 @@ namespace OrderService.Models
             this.Value = orderModel.Value;
         }
 
+        public Order()
+        {
+            
+        }
+
         public int Id { get; set; }
         public int UserId { get; set; }
         public int StockId { get; set; }

@@ -39,7 +39,7 @@ namespace StockService.Controllers
         }
 
         [HttpPost("")]
-        public IActionResult AddStock([FromBody] StockModel item)
+        public IActionResult AddStock(StockModel item)
         {
             var prevStock = dbcontext.Stocks.FirstOrDefault(n => n.Name == item.Name && n.FreePlace == item.FreePlace);
             if (prevStock == null)
@@ -51,8 +51,8 @@ namespace StockService.Controllers
             return BadRequest();
         }
 
-        [HttpPut("{id}")]
-        public IActionResult Update(long id, [FromBody] Stock item)
+        [HttpPut("upd/{id}")]
+        public IActionResult Update(long id, Stock item)
         {
             if (item == null || item.Id != id)
             {
