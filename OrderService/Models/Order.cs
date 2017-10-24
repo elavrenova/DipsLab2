@@ -11,11 +11,17 @@ namespace OrderService.Models
         public Order(OrderModel orderModel)
         {
             this.UserId = orderModel.UserId;
-            this.Email = orderModel.Email;
+            this.Status = orderModel.Status;
+            this.StockId = orderModel.StockId;
+            this.TransferId = orderModel.TransferId;
+            this.Value = orderModel.Value;
         }
 
-        public long Id { get; set; }
-        public long UserId { get; set; }
-        public string Email { get; set; }
+        public int Id { get; set; }
+        public int UserId { get; set; }
+        public int StockId { get; set; }
+        public double Value { get; set; }
+        public int Status { get; set; }
+        public int TransferId { get; set; }
     }
 }

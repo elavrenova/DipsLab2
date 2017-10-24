@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DipsLab2.Models;
 using Microsoft.AspNetCore.Mvc;
 using OrderService.Models;
 
@@ -9,24 +10,16 @@ using OrderService.Models;
 
 namespace OrderService.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api")]
     public class OrderController : Controller
     {
         private readonly OrderContext dbcontext;
         public OrderController(OrderContext context)
         {
-            dbcontext = context;
-
-            if (dbcontext.Orders.Count() == 0)
-            {
-                dbcontext.Orders.Add(new Order { UserId = 1, StockId = 1, TransferId = 1, Weight = 100.0, Status = 1 });
-                dbcontext.Orders.Add(new Order { UserId = 1, StockId = 2, TransferId = 1, Weight = 1000.0, Status = 0 });
-                dbcontext.Orders.Add(new Order { UserId = 1, StockId = 1, TransferId = 2, Weight = 500.0, Status = 2 });
-                dbcontext.SaveChanges();
-            }
+            this.dbcontext = context;
         }
 
-        [HttpGet]
+        [HttpGet("")]
         public IEnumerable<Order> GetAll()
         {
             return dbcontext.Orders.ToList();
@@ -44,21 +37,21 @@ namespace OrderService.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] Order item)
+        public IActionResult AddOrder([FromBody] OrderModel item)
         {
             if (item == null)
             {
                 return BadRequest();
             }
 
-            dbcontext.Orders.Add(item);
+            dbcontext.Orders.Add(new Order(item));
             dbcontext.SaveChanges();
 
-            return CreatedAtRoute("GetOrder", new { id = item.Id }, item);
+            return Ok();
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(long id, [FromBody] Order item)
+        public IActionResult Update(long id, [FromBody] OrderModel item)
         {
             if (item == null || item.Id != id)
             {
@@ -73,8 +66,7 @@ namespace OrderService.Controllers
 
             ord.UserId = item.UserId;
             ord.StockId = item.StockId;
-            ord.Weight = item.Weight;
-            ord.TransferId = item.TransferId;
+            ord.Value = item.Value;
             ord.Status = item.Status;
 
             dbcontext.Orders.Update(ord);

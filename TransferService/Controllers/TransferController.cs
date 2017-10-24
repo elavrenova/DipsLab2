@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DipsLab2.Models;
 using Microsoft.AspNetCore.Mvc;
 using TransferService.Models;
 
@@ -9,26 +10,22 @@ using TransferService.Models;
 
 namespace TransferService.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api")]
     public class TransferController : Controller
     {
         private readonly TransferContext dbcontext;
+
         public TransferController(TransferContext context)
         {
-            dbcontext = context;
-
-            if (dbcontext.Transfers.Count() == 0)
-            {
-                dbcontext.Transfers.Add(new Transfer { Name = "Volvo121", Carrying = 10000.0, Status = 1 });
-                dbcontext.Transfers.Add(new Transfer { Name = "Man333", Carrying = 3500.0, Status = 0 });
-                dbcontext.Transfers.Add(new Transfer { Name = "Kamaz987", Carrying = 5000.0, Status = 2 });
-                dbcontext.SaveChanges();
-            }
+            this.dbcontext = context;
         }
-        [HttpGet]
-        public IEnumerable<Transfer> GetAll()
+
+        [HttpGet("")]
+        public List<string> GetAllTransfers([FromRoute] int page, int perpage)
         {
-            return dbcontext.Transfers.ToList();
+            var transfers = dbcontext.Transfers;
+            return transfers.Select(n => $"Name: {n.Name}{Environment.NewLine}Carrying: {n.Carrying}{Environment.NewLine}Status: {n.Status}")
+                .ToList();
         }
 
         [HttpGet("{id}", Name = "GetTransfer")]
@@ -42,19 +39,24 @@ namespace TransferService.Controllers
             return new ObjectResult(item);
         }
 
-        [HttpPost]
-        public IActionResult Create([FromBody] Transfer item)
+        [HttpPost("")]
+        public IActionResult AddTransfer([FromBody] TransferModel item)
         {
-            if (item == null)
+            var prevTransf = dbcontext.Transfers.FirstOrDefault(n => n.Name == item.Name);
+            if (prevTransf == null)
             {
-                return BadRequest();
+                dbcontext.Transfers.Add(new Transfer(item)
+                {
+                    Name = item.Name,
+                    Carrying = item.Carrying,
+                    Status = item.Status
+                });
+                dbcontext.SaveChanges();
+                return Ok();
             }
-
-            dbcontext.Transfers.Add(item);
-            dbcontext.SaveChanges();
-
-            return CreatedAtRoute("GetTransfer", new { id = item.Id }, item);
+            return BadRequest(); 
         }
+
 
         [HttpPut("{id}")]
         public IActionResult Update(long id, [FromBody] Transfer item)

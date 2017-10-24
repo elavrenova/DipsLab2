@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DipsLab2.Models;
 using Microsoft.AspNetCore.Mvc;
 using StockService.Models;
 
@@ -9,25 +10,21 @@ using StockService.Models;
 
 namespace StockService.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api")]
     public class StockController : Controller
     {
         private readonly StockContext dbcontext;
         public StockController(StockContext context)
         {
-            dbcontext = context;
-
-            if (dbcontext.Stocks.Count() == 0)
-            {
-                dbcontext.Stocks.Add(new Stock { Name = "Stock1", FreePlace = 10000000.0 });
-                dbcontext.SaveChanges();
-            }
+            this.dbcontext = context;
         }
 
-        [HttpGet]
-        public IEnumerable<Stock> GetAll()
+        [HttpGet("")]
+        public List<string> GetAllStocks([FromRoute] int page, int perpage)
         {
-            return dbcontext.Stocks;
+            var stocks = dbcontext.Stocks;
+            return stocks.Select(n => $"Name: {n.Name}{Environment.NewLine}FreePlace: {n.FreePlace}{Environment.NewLine}")
+                .ToList();
         }
 
         [HttpGet("{id}", Name = "GetStock")]
@@ -41,18 +38,17 @@ namespace StockService.Controllers
             return new ObjectResult(item);
         }
 
-        [HttpPost]
-        public IActionResult Create([FromBody] Stock item)
+        [HttpPost("")]
+        public IActionResult AddStock([FromBody] StockModel item)
         {
-            if (item == null)
+            var prevStock = dbcontext.Stocks.FirstOrDefault(n => n.Name == item.Name && n.FreePlace == item.FreePlace);
+            if (prevStock == null)
             {
-                return BadRequest();
+                dbcontext.Stocks.Add(new Stock(item));
+                dbcontext.SaveChanges();
+                return Ok();
             }
-
-            dbcontext.Stocks.Add(item);
-            dbcontext.SaveChanges();
-
-            return CreatedAtRoute("GetStock", new { id = item.Id }, item);
+            return BadRequest();
         }
 
         [HttpPut("{id}")]
