@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using DipsLab2.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -109,11 +110,24 @@ namespace StockService.Controllers
             {
                 return BadRequest("not enough place");
             }
-            stck.FreePlace = stck.FreePlace - val;
-
+            stck.FreePlace = stck.FreePlace - item.Value;
             dbcontext.Stocks.Update(stck);
             dbcontext.SaveChanges();
-            return new NoContentResult();
+            return Ok();
+        }
+
+        [HttpPut("refuse_s/{id}")]
+        public async Task<IActionResult> RefuseStock(StockTransferOrderModel item)
+        {
+            var stck = dbcontext.Stocks.FirstOrDefault(t => t.Id == item.StockId);
+            if (stck == null)
+            {
+                return NotFound();
+            }
+            stck.FreePlace = stck.FreePlace + item.Value;
+            dbcontext.Stocks.Update(stck);
+            dbcontext.SaveChanges();
+            return Ok();
         }
 
         [HttpDelete("{id}")]

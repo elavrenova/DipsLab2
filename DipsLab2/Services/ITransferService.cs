@@ -9,8 +9,8 @@ namespace DipsLab2.Services
 {
     public interface ITransferService
     {
-        Task<List<string>> GetAllTransfers(int page, int perpage);
-        Task<HttpResponseMessage> BookTransfer(TransferModel transfer);
+        Task<List<string>> GetAllTransfers(int page, int size);
+        Task<HttpResponseMessage> BookTransfer(StockTransferOrderModel item);
         Task<HttpResponseMessage> RefuseTransfer(TransferModel transfer);
     }
 }

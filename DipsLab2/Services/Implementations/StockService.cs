@@ -36,7 +36,7 @@ namespace DipsLab2.Services.Implementations
         public async Task<HttpResponseMessage> BookStock(StockTransferOrderModel item) =>
             await PutJson("book_s/"+item.StockId, item);
 
-        public async Task<HttpResponseMessage> RefuseStock(StockModel stock) =>
-            await PutJson("refuse_s/" + stock.Id, stock);
+        public async Task<HttpResponseMessage> RefuseStock(StockTransferOrderModel item) =>
+            await PutJson("refuse_s/" + item.StockId, item);
     }
 }

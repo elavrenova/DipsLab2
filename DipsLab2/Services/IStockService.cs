@@ -11,6 +11,6 @@ namespace DipsLab2.Services
     {
         Task<List<string>> GetAllStocks(int page, int size);
         Task<HttpResponseMessage> BookStock(StockTransferOrderModel item);
-        Task<HttpResponseMessage> RefuseStock(StockModel stock);
+        Task<HttpResponseMessage> RefuseStock(StockTransferOrderModel item);
     }
 }

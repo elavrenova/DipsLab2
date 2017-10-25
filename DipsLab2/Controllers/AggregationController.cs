@@ -31,14 +31,82 @@ namespace DipsLab2.Controllers
         [HttpPost("order")]
         public async Task<IActionResult> AddOrder(StockTransferOrderModel item)
         {
-            var stockResp = stockService.BookStock();
-            if (stockResp == null)
+            var stockResp =  await stockService.BookStock(item);
+            if (stockResp?.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                orderModel.Status = 20;
+                item.OrderStatus = 20;
                 return BadRequest("Stock wasn't found");
             }
+            if (stockResp?.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                item.OrderStatus = 30;
+                return BadRequest("There isn't enough place");
+            }
+            item.OrderStatus = 10;
+            var transfResp = await transferService.BookTransfer(item);
+            if (transfResp?.StatusCode == System.Net.HttpStatusCode.NoContent)
+            {
+                item.OrderStatus = item.OrderStatus + 2;
+                return BadRequest("There are no transfers");
+            }
+            if (transfResp?.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                item.OrderStatus += 3;
+                var refStckResp = await stockService.RefuseStock(item);
+                if (refStckResp?.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    item.OrderStatus = 23;
+                    return BadRequest("Stock wasn't found to refuse");
+                }
+                item.OrderStatus = 03;
+                return BadRequest("All transfers are busy");
+            }
+            item.OrderStatus += 1;
+            var ordResp = await orderService.AddOrder(item);
+            if (ordResp?.StatusCode == System.Net.HttpStatusCode.NoContent)
+            {
+                item.OrderStatus = 44;
+                return NoContent();
+            }
+            return Ok();
+        }
 
-
+        [HttpPost("refuse")]
+        public async Task<IActionResult> AddNewOrder(StockTransferOrderModel item)
+        {
+            var stockResp = await stockService.BookStock(item);
+            if (stockResp?.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                item.OrderStatus = 20;
+                return BadRequest("Stock wasn't found");
+            }
+            if (stockResp?.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                item.OrderStatus = 30;
+                return BadRequest("There isn't enough place");
+            }
+            item.OrderStatus = 10;
+            var transfResp = await transferService.BookTransfer(item);
+            if (transfResp?.StatusCode == System.Net.HttpStatusCode.NoContent)
+            {
+                item.OrderStatus = item.OrderStatus + 2;
+                return BadRequest("There are no transfers");
+            }
+            if (transfResp?.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                item.OrderStatus += 3;
+                var refStckResp = await stockService.RefuseStock(item);
+                if (refStckResp?.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    item.OrderStatus = 23;
+                    return BadRequest("Stock wasn't found to refuse");
+                }
+                item.OrderStatus = 03;
+                return BadRequest("All transfers are busy");
+            }
+            item.OrderStatus += 1;
+            orderService.AddOrder(item)
+            return Ok();
         }
 
         [HttpGet("info")]

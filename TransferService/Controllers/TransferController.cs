@@ -67,24 +67,33 @@ namespace TransferService.Controllers
 
 
         [HttpPut("book_t/{id}")]
-        public async Task<IActionResult> BookTransfer(long id, TransferModel item)
+        public async Task<IActionResult> BookTransfer(StockTransferOrderModel item)
         {
-            if (item == null || item.Id != id)
-            {
-                return BadRequest();
-            }
-
-            var trans = dbcontext.Transfers.FirstOrDefault(t => t.Id == id);
+            var trans = dbcontext.Transfers;
             if (trans == null)
             {
-                return NotFound();
+                return NoContent();
             }
-            trans.Name = item.Name;
-            trans.Status = item.Status;
+            var TransId = 0;
+            foreach (var t in trans)
+            {
+                if (TransId > 0)
+                    break;
+                if (t.Carrying >= item.Value && t.Status == 0)
+                {
+                    TransId = t.Id;
+                }
+            }
 
-            dbcontext.Transfers.Update(trans);
+            if (TransId == 0)
+            {
+                return BadRequest("All transfers are busy");
+            }
+            var transfer = dbcontext.Transfers.FirstOrDefault(t => t.Id == TransId);
+            transfer.Status = 1;
+            dbcontext.Transfers.Update(transfer);
             dbcontext.SaveChanges();
-            return new NoContentResult();
+            return Ok();
         }
 
         [HttpPut("refuse_t/{id}")]

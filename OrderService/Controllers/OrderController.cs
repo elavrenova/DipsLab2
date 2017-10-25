@@ -47,16 +47,22 @@ namespace OrderService.Controllers
         }
 
         [HttpPost("")]
-        public async Task<IActionResult> AddOrder(OrderModel item)
+        public async Task<IActionResult> AddOrder(StockTransferOrderModel item)
         {
             if (item == null)
             {
-                return BadRequest();
+                return NoContent();
             }
 
-            dbcontext.Orders.Add(new Order(item));
+            dbcontext.Orders.Add(new Order()
+            {
+                Status = item.OrderStatus,
+                StockId = item.StockId,
+                TransferId = item.TransferId,
+                UserId = item.UserId,
+                Value = item.Value
+            });
             dbcontext.SaveChanges();
-
             return Ok();
         }
 
