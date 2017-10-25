@@ -70,16 +70,6 @@ namespace UnitTests
             Assert.IsFalse(result is OkResult);
         }
 
-        //[TestMethod]
-        //public void TestGetNewsNotValid()
-        //{
-        //    var stockController = GetStockController();
-
-        //    var result = newsController.GetNewsForUser(username, 0, 0).Result;
-        //    Assert.IsTrue(result.Count == 0);
-        //}
-
-
         private StockController GetStockController()
         {
             return new StockController(dbContext, logger);
