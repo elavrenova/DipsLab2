@@ -35,7 +35,7 @@ namespace OrderService.Controllers
                 .ToList();
         }
 
-        [HttpGet("{id}", Name = "GetOrder")]
+        [HttpGet("getorder/{id}")]
         public IActionResult GetById(long id)
         {
             var item = dbcontext.Orders.FirstOrDefault(t => t.Id == id);

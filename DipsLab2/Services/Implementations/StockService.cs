@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using DipsLab2.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
@@ -29,8 +30,11 @@ namespace DipsLab2.Services.Implementations
             }
         }
 
-        public async Task<HttpResponseMessage> BookStock(StockModel stock) =>
-            await PutJson("book_s/"+stock.Id, stock);
+        //public async Task<HttpResponseMessage> GetStockById(int id, StockModel stock, double val) =>
+        //    await PutJson("book_s/" + stock.Id, stock);
+
+        public async Task<HttpResponseMessage> BookStock(StockTransferOrderModel item) =>
+            await PutJson("book_s/"+item.StockId, item);
 
         public async Task<HttpResponseMessage> RefuseStock(StockModel stock) =>
             await PutJson("refuse_s/" + stock.Id, stock);
