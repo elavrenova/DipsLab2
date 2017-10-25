@@ -27,7 +27,7 @@ namespace StockService.Controllers
         public List<string> GetAllStocks([FromRoute] int page, int size)
         {
             logger.LogDebug($"Getting list of stocks on page={page} ");
-            var stocks = dbcontext.Stocks.AsEnumerable<Stock>();
+            var stocks = dbcontext.Stocks.Where(s => true);
             if (size != 0 && page != 0)
             {
                 logger.LogDebug($"Looking for page {page} ");
@@ -46,12 +46,16 @@ namespace StockService.Controllers
         [HttpGet("getstock/{id}")]
         public StockModel GetById(long id)
         {
+            logger.LogDebug($"Getting stock by id");
             var item = dbcontext.Stocks.FirstOrDefault(t => t.Id == id);
             if (item == null)
             {
+                logger.LogDebug($"Can't find stock with id = {id}");
                 return null;
             }
+            logger.LogDebug($"Creating new stock");
             StockModel sm = new StockModel();
+            logger.LogDebug($"Assigning parameters to new stock");
             sm.Name = item.Name;
             sm.FreePlace = item.FreePlace;
             return sm;
@@ -74,58 +78,47 @@ namespace StockService.Controllers
             return BadRequest();
         }
 
-        [HttpPut("upd/{id}")]
-        public IActionResult Update(long id, Stock item)
+        
+
+        [HttpPut("books")]
+        public async Task<IActionResult> BookStock([FromBody]StockTransferOrderModel item)
         {
-            
-            if (item == null || item.Id != id)
-            {
-                logger.LogDebug($"");
-                return BadRequest();
-            }
-
-            var stck = dbcontext.Stocks.FirstOrDefault(t => t.Id == id);
-            if (stck == null)
-            {
-                return NotFound();
-            }
-
-            stck.Name = item.Name;
-            stck.FreePlace = item.FreePlace;
-
-            dbcontext.Stocks.Update(stck);
-            dbcontext.SaveChanges();
-            return new NoContentResult();
-        }
-
-        [HttpPut("book_s/{id}")]
-        public async Task<IActionResult> BookStock(StockTransferOrderModel item)
-        {
+            logger.LogDebug($"Getting stock with id = {item.StockId}");
             var stck = dbcontext.Stocks.FirstOrDefault(t => t.Id == item.StockId);
             if (stck == null)
             {
+                logger.LogDebug($"Can't find stock with id = {item.StockId}");
                 return NotFound();
             }
             if (stck.FreePlace < item.Value)
             {
+                logger.LogDebug($"The stock {item.StockId} doesn't have enough place for order");
                 return BadRequest("not enough place");
             }
+            logger.LogDebug($"Booking place in the stock id = {item.StockId}");
             stck.FreePlace = stck.FreePlace - item.Value;
-            dbcontext.Stocks.Update(stck);
+            logger.LogDebug($"Updating database");
+            var res = dbcontext.Stocks.Update(stck);
+            logger.LogDebug($"Saving changes");
             dbcontext.SaveChanges();
             return Ok();
         }
 
-        [HttpPut("refuse_s/{id}")]
+        [HttpPut("refuses")]
         public async Task<IActionResult> RefuseStock(StockTransferOrderModel item)
         {
+            logger.LogDebug($"Getting stock with id = {item.StockId}");
             var stck = dbcontext.Stocks.FirstOrDefault(t => t.Id == item.StockId);
             if (stck == null)
             {
+                logger.LogDebug($"Can't find stock with id = {item.StockId}");
                 return NotFound();
             }
+            logger.LogDebug($"Refusing place in the stock id = {item.StockId}");
             stck.FreePlace = stck.FreePlace + item.Value;
+            logger.LogDebug($"Updating database");
             dbcontext.Stocks.Update(stck);
+            logger.LogDebug($"Saving changes");
             dbcontext.SaveChanges();
             return Ok();
         }
@@ -133,13 +126,17 @@ namespace StockService.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(long id)
         {
+            logger.LogDebug($"Getting stock with id = {id}");
             var stck = dbcontext.Stocks.FirstOrDefault(t => t.Id == id);
             if (stck == null)
             {
+                logger.LogDebug($"Can't find stock with id = {id}");
+
                 return NotFound();
             }
-
+            logger.LogDebug($"Updating database");
             dbcontext.Stocks.Remove(stck);
+            logger.LogDebug($"Saving changes");
             dbcontext.SaveChanges();
             return new NoContentResult();
         }

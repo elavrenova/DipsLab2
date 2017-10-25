@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using DipsLab2.Models;
 using Microsoft.AspNetCore.Mvc;
 using TransferService.Models;
+using Microsoft.EntityFrameworkCore;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -65,8 +66,7 @@ namespace TransferService.Controllers
             return BadRequest(); 
         }
 
-
-        [HttpPut("book_t/{id}")]
+        [HttpPut("bookt")]
         public async Task<IActionResult> BookTransfer(StockTransferOrderModel item)
         {
             var trans = dbcontext.Transfers;
@@ -91,26 +91,27 @@ namespace TransferService.Controllers
             }
             var transfer = dbcontext.Transfers.FirstOrDefault(t => t.Id == TransId);
             transfer.Status = 1;
+            item.TransferId = TransId;
             dbcontext.Transfers.Update(transfer);
             dbcontext.SaveChanges();
             return Ok();
         }
 
-        [HttpPut("refuse_t/{id}")]
-        public async Task<IActionResult> RefuseTransfer(long id, TransferModel item)
+        [HttpPut("refuset")]
+        public async Task<IActionResult> RefuseTransfer(StockTransferOrderModel item)
         {
-            if (item == null || item.Id != id)
+            if (item == null)
             {
-                return BadRequest();
+                return NoContent();
             }
 
-            var trans = dbcontext.Transfers.FirstOrDefault(t => t.Id == id);
+            var trans = dbcontext.Transfers.FirstOrDefault(t => t.Id == item.TransferId);
             if (trans == null)
             {
                 return NotFound();
             }
 
-            trans.Status = item.Status;
+            trans.Status = 0;
 
             dbcontext.Transfers.Update(trans);
             dbcontext.SaveChanges();

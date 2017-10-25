@@ -8,10 +8,7 @@ namespace DipsLab2.Models
     public class StockTransferOrderModel
     {
         public int Id { get; set; }
-        public string StockName { get; set; }
-        public double FreePlace { get; set; }
         public int StockId { get; set; }
-        public string TransferName { get; set; }
         public double Carrying { get; set; }
         public int TransferStatus { get; set; }
         public int TransferId { get; set; }

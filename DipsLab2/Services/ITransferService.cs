@@ -11,6 +11,6 @@ namespace DipsLab2.Services
     {
         Task<List<string>> GetAllTransfers(int page, int size);
         Task<HttpResponseMessage> BookTransfer(StockTransferOrderModel item);
-        Task<HttpResponseMessage> RefuseTransfer(TransferModel transfer);
+        Task<HttpResponseMessage> RefuseTransfer(StockTransferOrderModel item);
     }
 }

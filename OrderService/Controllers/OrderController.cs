@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using DipsLab2.Models;
 using Microsoft.AspNetCore.Mvc;
 using OrderService.Models;
+using Microsoft.Extensions.Logging;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -14,23 +15,29 @@ namespace OrderService.Controllers
     public class OrderController : Controller
     {
         private readonly OrderContext dbcontext;
+        private ILogger<OrderController> logger;
         public OrderController(OrderContext context)
         {
+            this.logger = logger;
             this.dbcontext = context;
         }
 
         [HttpGet("")]
         public async Task<List<string>> GetAllOrders([FromRoute]int page, int size)
         {
+            logger.LogDebug($"Getting list of orders on page={page} ");
             var orders = dbcontext.Orders.AsEnumerable<Order>();
             if (size != 0 && page != 0)
             {
+                logger.LogDebug($"Looking for page {page} with orders ");
                 orders = orders.Skip(size * page);
             }
             if (size != 0)
             {
+                logger.LogDebug($"Getting first {size} orders");
                 orders = orders.Take(size);
             }
+            logger.LogDebug($"Returning {orders.Count()} orders");
             return orders.Select(n => $"UserId: {n.UserId}{Environment.NewLine}StockId: {n.StockId}{Environment.NewLine}Status: {n.Status}{Environment.NewLine}Value: {n.Value}{Environment.NewLine}TransferId: {n.TransferId}")
                 .ToList();
         }
@@ -38,11 +45,14 @@ namespace OrderService.Controllers
         [HttpGet("getorder/{id}")]
         public IActionResult GetById(long id)
         {
+            logger.LogDebug($"Getting order by id");
             var item = dbcontext.Orders.FirstOrDefault(t => t.Id == id);
             if (item == null)
             {
+                logger.LogDebug($"Can't find order with id = {id}");
                 return NotFound();
             }
+            logger.LogDebug($"Returning order");
             return new ObjectResult(item);
         }
 
@@ -51,6 +61,7 @@ namespace OrderService.Controllers
         {
             if (item == null)
             {
+                logger.LogDebug($"Info for creating order is empty");
                 return NoContent();
             }
 
@@ -67,14 +78,14 @@ namespace OrderService.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateOrder(long id, OrderModel item)
+        public async Task<IActionResult> UpdateOrder( StockTransferOrderModel item)
         {
-            if (item == null || item.Id != id)
+            if (item == null)
             {
-                return BadRequest();
+                return NoContent();
             }
 
-            var ord = dbcontext.Orders.FirstOrDefault(t => t.Id == id);
+            var ord = dbcontext.Orders.FirstOrDefault(t => t.Id == item.Id);
             if (ord == null)
             {
                 return NotFound();
@@ -83,7 +94,7 @@ namespace OrderService.Controllers
             ord.UserId = item.UserId;
             ord.StockId = item.StockId;
             ord.Value = item.Value;
-            ord.Status = item.Status;
+            ord.Status = item.TransferStatus;
 
             dbcontext.Orders.Update(ord);
             dbcontext.SaveChanges();

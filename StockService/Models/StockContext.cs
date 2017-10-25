@@ -8,6 +8,10 @@ namespace StockService.Models
 {
     public class StockContext : DbContext
     {
+        public StockContext() : base()
+        {
+            
+        }
         public StockContext(DbContextOptions<StockContext> options)
             : base(options)
         {

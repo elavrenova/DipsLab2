@@ -19,6 +19,11 @@ namespace DipsLab2
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .ConfigureLogging((hostingContext, logging) =>
+                {
+                    logging.AddConsole();
+                    logging.AddDebug();
+                })
                 .UseStartup<Startup>()
                 .Build();
     }

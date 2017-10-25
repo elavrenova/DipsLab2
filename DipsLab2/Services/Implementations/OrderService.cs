@@ -36,9 +36,9 @@ namespace DipsLab2.Services.Implementations
             return await PostJson("", item);
         }
 
-        public async Task<HttpResponseMessage> UpdateOrder(OrderModel orderModel)
+        public async Task<HttpResponseMessage> UpdateOrder(StockTransferOrderModel item)
         {
-            return await PutJson("", orderModel);
+            return await PutJson("", item);
         }
 
     }

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DipsLab2.Services;
+using DipsLab2.Services.Implementations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -24,6 +26,10 @@ namespace DipsLab2
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
+            services.AddTransient<IOrderService, OrderService>();
+            services.AddTransient<IStockService, StockService>();
+            services.AddTransient<ITransferService, TransferService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

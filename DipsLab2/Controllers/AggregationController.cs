@@ -52,60 +52,42 @@ namespace DipsLab2.Controllers
             if (transfResp?.StatusCode == System.Net.HttpStatusCode.BadRequest)
             {
                 item.OrderStatus += 3;
-                var refStckResp = await stockService.RefuseStock(item);
-                if (refStckResp?.StatusCode == System.Net.HttpStatusCode.NotFound)
-                {
-                    item.OrderStatus = 23;
-                    return BadRequest("Stock wasn't found to refuse");
-                }
-                item.OrderStatus = 03;
                 return BadRequest("All transfers are busy");
             }
             item.OrderStatus += 1;
-            var ordResp = await orderService.AddOrder(item);
-            if (ordResp?.StatusCode == System.Net.HttpStatusCode.NoContent)
-            {
-                item.OrderStatus = 44;
-                return NoContent();
-            }
+            //var ordResp = await orderService.AddOrder(item);
+            //if (ordResp?.StatusCode == System.Net.HttpStatusCode.NoContent)
+            //{
+            //    item.OrderStatus = 44;
+            //    return NoContent();
+            //}
             return Ok();
         }
+    
 
-        [HttpPost("refuse")]
-        public async Task<IActionResult> AddNewOrder(StockTransferOrderModel item)
+        [HttpPut("refuse")]
+        public async Task<IActionResult> RefuseOrder(StockTransferOrderModel item)
         {
-            var stockResp = await stockService.BookStock(item);
+            var stockResp = await stockService.RefuseStock(item);
             if (stockResp?.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 item.OrderStatus = 20;
                 return BadRequest("Stock wasn't found");
             }
-            if (stockResp?.StatusCode == System.Net.HttpStatusCode.BadRequest)
-            {
-                item.OrderStatus = 30;
-                return BadRequest("There isn't enough place");
-            }
-            item.OrderStatus = 10;
-            var transfResp = await transferService.BookTransfer(item);
+            item.OrderStatus = 90;
+            var transfResp = await transferService.RefuseTransfer(item);
             if (transfResp?.StatusCode == System.Net.HttpStatusCode.NoContent)
             {
                 item.OrderStatus = item.OrderStatus + 2;
-                return BadRequest("There are no transfers");
+                return BadRequest("No info for refusing transfer");
             }
-            if (transfResp?.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            if (transfResp?.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 item.OrderStatus += 3;
-                var refStckResp = await stockService.RefuseStock(item);
-                if (refStckResp?.StatusCode == System.Net.HttpStatusCode.NotFound)
-                {
-                    item.OrderStatus = 23;
-                    return BadRequest("Stock wasn't found to refuse");
-                }
-                item.OrderStatus = 03;
-                return BadRequest("All transfers are busy");
+                return BadRequest("Can't find transfer for refuse");
             }
-            item.OrderStatus += 1;
-            orderService.AddOrder(item)
+            item.OrderStatus += 9;
+            var orderRes = orderService.UpdateOrder(item);
             return Ok();
         }
 
