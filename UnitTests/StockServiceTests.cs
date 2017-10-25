@@ -57,7 +57,6 @@ namespace UnitTests
 
             var result = stockController.AddStock(Mock.Of<StockModel>());
             Assert.IsTrue(result is OkResult);
-            //Assert.IsTrue(stocks.First().Author == username);
         }
 
         [TestMethod]
