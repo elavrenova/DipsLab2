@@ -96,7 +96,7 @@ namespace DipsLab2.Controllers
         {
             int page = 1;
             int size = 5;
-            List<string> stockList = await stockService.GetAllStocks(page, size);
+            List<string> stockList = stockService.GetAllStocks(page, size);
             List<string> transferList = await transferService.GetAllTransfers(page, size);
             if (transferList == null || stockList == null)
             {

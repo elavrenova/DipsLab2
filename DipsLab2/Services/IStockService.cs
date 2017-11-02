@@ -9,7 +9,7 @@ namespace DipsLab2.Services
 {
     public interface IStockService
     {
-        Task<List<string>> GetAllStocks(int page, int size);
+        List<string> GetAllStocks(int page, int size);
         Task<HttpResponseMessage> BookStock(StockTransferOrderModel item);
         Task<HttpResponseMessage> RefuseStock(StockTransferOrderModel item);
     }

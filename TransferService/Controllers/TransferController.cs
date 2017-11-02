@@ -22,9 +22,9 @@ namespace TransferService.Controllers
         }
 
         [HttpGet("")]
-        public async Task<List<string>> GetAllTransfers([FromRoute] int page, int size)
+        public async Task<List<Transfer>> GetAllTransfers(int page, int size)
         {
-            var transfers = dbcontext.Transfers.AsEnumerable<Transfer>();
+            var transfers = dbcontext.Transfers.Where(s=> true);
             if (size != 0 && page != 0)
             {
                 transfers = transfers.Skip(size * page);
@@ -33,8 +33,7 @@ namespace TransferService.Controllers
             {
                 transfers = transfers.Take(size);
             }
-            return transfers.Select(n => $"Name: {n.Name}{Environment.NewLine}Carrying: {n.Carrying}{Environment.NewLine}Status: {n.Status}")
-                .ToList();
+            return transfers.ToList();
         }
 
         [HttpGet("{id}", Name = "GetTransfer")]
@@ -67,7 +66,7 @@ namespace TransferService.Controllers
         }
 
         [HttpPut("bookt")]
-        public async Task<IActionResult> BookTransfer(StockTransferOrderModel item)
+        public IActionResult BookTransfer(StockTransferOrderModel item)
         {
             var trans = dbcontext.Transfers;
             if (trans == null)
@@ -98,7 +97,7 @@ namespace TransferService.Controllers
         }
 
         [HttpPut("refuset")]
-        public async Task<IActionResult> RefuseTransfer(StockTransferOrderModel item)
+        public IActionResult RefuseTransfer(StockTransferOrderModel item)
         {
             if (item == null)
             {

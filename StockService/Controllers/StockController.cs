@@ -24,10 +24,12 @@ namespace StockService.Controllers
         }
 
         [HttpGet("")]
-        public List<string> GetAllStocks([FromRoute] int page, int size)
+        public List<Stock> GetAllStocks(int page, int size)
         {
             logger.LogDebug($"Getting list of stocks on page={page} ");
             var stocks = dbcontext.Stocks.Where(s => true);
+            //var stocks = dbcontext.Stocks.AsEnumerable();
+
             if (size != 0 && page != 0)
             {
                 logger.LogDebug($"Looking for page {page} ");
@@ -39,8 +41,7 @@ namespace StockService.Controllers
                 stocks = stocks.Take(size);
             }
             logger.LogDebug($"Returning {stocks.Count()} stocks");
-            return stocks.Select(n => $"Name: {n.Name}{Environment.NewLine}FreePlace: {n.FreePlace}{Environment.NewLine}")
-                .ToList();
+            return stocks.ToList();
         }
 
         [HttpGet("getstock/{id}")]
@@ -61,7 +62,7 @@ namespace StockService.Controllers
             return sm;
         }
 
-        [HttpPost("")]
+        [HttpPost("addstock")]
         public IActionResult AddStock(StockModel item)
         {
             logger.LogDebug($"Looking for stock with the same info");
@@ -78,10 +79,10 @@ namespace StockService.Controllers
             return BadRequest();
         }
 
-        
+
 
         [HttpPut("books")]
-        public async Task<IActionResult> BookStock([FromBody]StockTransferOrderModel item)
+        public IActionResult BookStock([FromBody]StockTransferOrderModel item)
         {
             logger.LogDebug($"Getting stock with id = {item.StockId}");
             var stck = dbcontext.Stocks.FirstOrDefault(t => t.Id == item.StockId);
@@ -105,7 +106,7 @@ namespace StockService.Controllers
         }
 
         [HttpPut("refuses")]
-        public async Task<IActionResult> RefuseStock(StockTransferOrderModel item)
+        public IActionResult RefuseStock(StockTransferOrderModel item)
         {
             logger.LogDebug($"Getting stock with id = {item.StockId}");
             var stck = dbcontext.Stocks.FirstOrDefault(t => t.Id == item.StockId);
@@ -123,22 +124,22 @@ namespace StockService.Controllers
             return Ok();
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult Delete(long id)
-        {
-            logger.LogDebug($"Getting stock with id = {id}");
-            var stck = dbcontext.Stocks.FirstOrDefault(t => t.Id == id);
-            if (stck == null)
-            {
-                logger.LogDebug($"Can't find stock with id = {id}");
+        //[HttpDelete("{id}")]
+        //public IActionResult Delete(long id)
+        //{
+        //    logger.LogDebug($"Getting stock with id = {id}");
+        //    var stck = dbcontext.Stocks.FirstOrDefault(t => t.Id == id);
+        //    if (stck == null)
+        //    {
+        //        logger.LogDebug($"Can't find stock with id = {id}");
 
-                return NotFound();
-            }
-            logger.LogDebug($"Updating database");
-            dbcontext.Stocks.Remove(stck);
-            logger.LogDebug($"Saving changes");
-            dbcontext.SaveChanges();
-            return new NoContentResult();
-        }
+        //        return NotFound();
+        //    }
+        //    logger.LogDebug($"Updating database");
+        //    dbcontext.Stocks.Remove(stck);
+        //    logger.LogDebug($"Saving changes");
+        //    dbcontext.SaveChanges();
+        //    return new NoContentResult();
+        //}
     }
 }

@@ -23,10 +23,10 @@ namespace OrderService.Controllers
         }
 
         [HttpGet("")]
-        public async Task<List<string>> GetAllOrders([FromRoute]int page, int size)
+        public async Task<List<Order>> GetAllOrders(int page, int size)
         {
             logger.LogDebug($"Getting list of orders on page={page} ");
-            var orders = dbcontext.Orders.AsEnumerable<Order>();
+            var orders = dbcontext.Orders.Where(s=>true);
             if (size != 0 && page != 0)
             {
                 logger.LogDebug($"Looking for page {page} with orders ");
@@ -38,8 +38,7 @@ namespace OrderService.Controllers
                 orders = orders.Take(size);
             }
             logger.LogDebug($"Returning {orders.Count()} orders");
-            return orders.Select(n => $"UserId: {n.UserId}{Environment.NewLine}StockId: {n.StockId}{Environment.NewLine}Status: {n.Status}{Environment.NewLine}Value: {n.Value}{Environment.NewLine}TransferId: {n.TransferId}")
-                .ToList();
+            return orders.ToList();
         }
 
         [HttpGet("getorder/{id}")]

@@ -7,6 +7,7 @@ using DipsLab2.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using System.Collections;
 
 namespace DipsLab2.Services.Implementations
 {
@@ -15,10 +16,10 @@ namespace DipsLab2.Services.Implementations
         public StockService(IConfiguration configuration) : 
             base(configuration.GetSection("Urls")["Stock"]) { }
 
-        public async Task<List<string>> GetAllStocks(int page, int perpage)
+        public List<string> GetAllStocks(int page, int size)
         {
-            var res = await Get($"?page={page}&perpage={perpage}");
-            string response = await res.Content.ReadAsStringAsync();
+            var res = Get($"?page={page}&size={size}").Result;
+            string response = res.Content.ReadAsStringAsync().Result;
 
             try
             {
