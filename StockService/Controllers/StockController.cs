@@ -29,7 +29,6 @@ namespace StockService.Controllers
             logger.LogDebug($"Getting list of stocks on page={page} ");
             var stocks = dbcontext.Stocks.Where(s => true);
             //var stocks = dbcontext.Stocks.AsEnumerable();
-
             if (size != 0 && page != 0)
             {
                 logger.LogDebug($"Looking for page {page} ");
@@ -44,23 +43,23 @@ namespace StockService.Controllers
             return stocks.ToList();
         }
 
-        [HttpGet("getstock/{id}")]
-        public StockModel GetById(long id)
-        {
-            logger.LogDebug($"Getting stock by id");
-            var item = dbcontext.Stocks.FirstOrDefault(t => t.Id == id);
-            if (item == null)
-            {
-                logger.LogDebug($"Can't find stock with id = {id}");
-                return null;
-            }
-            logger.LogDebug($"Creating new stock");
-            StockModel sm = new StockModel();
-            logger.LogDebug($"Assigning parameters to new stock");
-            sm.Name = item.Name;
-            sm.FreePlace = item.FreePlace;
-            return sm;
-        }
+        //[HttpGet("getstock/{id}")]
+        //public StockModel GetById(long id)
+        //{
+        //    logger.LogDebug($"Getting stock by id");
+        //    var item = dbcontext.Stocks.FirstOrDefault(t => t.Id == id);
+        //    if (item == null)
+        //    {
+        //        logger.LogDebug($"Can't find stock with id = {id}");
+        //        return null;
+        //    }
+        //    logger.LogDebug($"Creating new stock");
+        //    StockModel sm = new StockModel();
+        //    logger.LogDebug($"Assigning parameters to new stock");
+        //    sm.Name = item.Name;
+        //    sm.FreePlace = item.FreePlace;
+        //    return sm;
+        //}
 
         [HttpPost("addstock")]
         public IActionResult AddStock(StockModel item)
@@ -106,7 +105,7 @@ namespace StockService.Controllers
         }
 
         [HttpPut("refuses")]
-        public IActionResult RefuseStock(StockTransferOrderModel item)
+        public IActionResult RefuseStock([FromBody]StockTransferOrderModel item)
         {
             logger.LogDebug($"Getting stock with id = {item.StockId}");
             var stck = dbcontext.Stocks.FirstOrDefault(t => t.Id == item.StockId);

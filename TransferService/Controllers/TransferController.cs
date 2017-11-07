@@ -6,6 +6,7 @@ using DipsLab2.Models;
 using Microsoft.AspNetCore.Mvc;
 using TransferService.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -15,16 +16,19 @@ namespace TransferService.Controllers
     public class TransferController : Controller
     {
         private readonly TransferContext dbcontext;
+        private ILogger<TransferController> logger;
 
-        public TransferController(TransferContext context)
+        public TransferController(TransferContext context, ILogger<TransferController> logger)
         {
             this.dbcontext = context;
+            this.logger = logger;
         }
 
         [HttpGet("")]
         public async Task<List<Transfer>> GetAllTransfers(int page, int size)
         {
             var transfers = dbcontext.Transfers.Where(s=> true);
+            //var transfers = dbcontext.Transfers.AsEnumerable();
             if (size != 0 && page != 0)
             {
                 transfers = transfers.Skip(size * page);
@@ -36,16 +40,16 @@ namespace TransferService.Controllers
             return transfers.ToList();
         }
 
-        [HttpGet("{id}", Name = "GetTransfer")]
-        public IActionResult GetById(long id)
-        {
-            var item = dbcontext.Transfers.FirstOrDefault(t => t.Id == id);
-            if (item == null)
-            {
-                return NotFound();
-            }
-            return new ObjectResult(item);
-        }
+        //[HttpGet("{id}", Name = "GetTransfer")]
+        //public IActionResult GetById(long id)
+        //{
+        //    var item = dbcontext.Transfers.FirstOrDefault(t => t.Id == id);
+        //    if (item == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return new ObjectResult(item);
+        //}
 
         [HttpPost("")]
         public IActionResult AddTransfer(TransferModel item)
@@ -66,7 +70,7 @@ namespace TransferService.Controllers
         }
 
         [HttpPut("bookt")]
-        public IActionResult BookTransfer(StockTransferOrderModel item)
+        public IActionResult BookTransfer([FromBody]StockTransferOrderModel item)
         {
             var trans = dbcontext.Transfers;
             if (trans == null)
@@ -97,7 +101,7 @@ namespace TransferService.Controllers
         }
 
         [HttpPut("refuset")]
-        public IActionResult RefuseTransfer(StockTransferOrderModel item)
+        public IActionResult RefuseTransfer([FromBody]StockTransferOrderModel item)
         {
             if (item == null)
             {
@@ -114,21 +118,21 @@ namespace TransferService.Controllers
 
             dbcontext.Transfers.Update(trans);
             dbcontext.SaveChanges();
-            return new NoContentResult();
+            return Ok();
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult Delete(long id)
-        {
-            var trans = dbcontext.Transfers.FirstOrDefault(t => t.Id == id);
-            if (trans == null)
-            {
-                return NotFound();
-            }
+        //[HttpDelete("{id}")]
+        //public IActionResult Delete(long id)
+        //{
+        //    var trans = dbcontext.Transfers.FirstOrDefault(t => t.Id == id);
+        //    if (trans == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            dbcontext.Transfers.Remove(trans);
-            dbcontext.SaveChanges();
-            return new NoContentResult();
-        }
+        //    dbcontext.Transfers.Remove(trans);
+        //    dbcontext.SaveChanges();
+        //    return new NoContentResult();
+        //}
     }
 }

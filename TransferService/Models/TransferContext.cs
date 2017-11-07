@@ -12,6 +12,11 @@ namespace TransferService.Models
             : base(options)
         {
         }
+
+        public TransferContext()
+            : base()
+        {
+        }
         public DbSet<Transfer> Transfers { get; set; }
     }
 }

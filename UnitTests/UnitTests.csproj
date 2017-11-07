@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DipsLab2\DipsLab2.csproj" />
     <ProjectReference Include="..\StockService\StockService.csproj" />
+    <ProjectReference Include="..\TransferService\TransferService.csproj" />
   </ItemGroup>
 
 </Project>

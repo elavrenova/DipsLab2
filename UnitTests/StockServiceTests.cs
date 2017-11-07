@@ -17,6 +17,8 @@ namespace UnitTests
     [TestClass]
     public class StockServiceTests
     {
+        private const double freeplace = 100.0;
+        private const int id = 1;
         private StockContext dbContext;
         private ILogger<StockController> logger;
 
@@ -29,13 +31,13 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void TestMethod1()
+        public void TestGetStocksValid()
         {
             List<Stock> stocks = new List<Stock> {new Stock()};
             dbContext = GetDbContext(stocks);
             var stockController = GetStockController();
 
-            var result = stockController.GetAllStocks(0, 0);
+            var result = stockController.GetAllStocks(0,0);
             Assert.IsTrue(result.Count == stocks.Count);
         }
 
@@ -68,6 +70,39 @@ namespace UnitTests
 
             var result = stockController.AddStock(Mock.Of<StockModel>());
             Assert.IsFalse(result is OkResult);
+        }
+
+        [TestMethod]
+        public void TestBookStockValid()
+        {
+            var stocks = new List<Stock> {new Stock {FreePlace = freeplace}};
+            dbContext = GetDbContext(stocks);
+            var stockController = GetStockController();
+
+            var result = stockController.BookStock(Mock.Of<StockTransferOrderModel>(x => x.Value == 50.0));
+            Assert.IsTrue(result is OkResult);
+        }
+
+        [TestMethod]
+        public void TestBookStockValueNotValid()
+        {
+            var stocks = new List<Stock> { new Stock { FreePlace = freeplace } };
+            dbContext = GetDbContext(stocks);
+            var stockController = GetStockController();
+
+            var result = stockController.BookStock(Mock.Of<StockTransferOrderModel>(x => x.Value == 150.0));
+            Assert.IsTrue(result is BadRequestObjectResult);
+        }
+
+        [TestMethod]
+        public void TestBookStockNotFound()
+        {
+            var stocks = new List<Stock> { new Stock { Id = id } };
+            dbContext = GetDbContext(stocks);
+            var stockController = GetStockController();
+
+            var result = stockController.BookStock(Mock.Of<StockTransferOrderModel>(x => x.StockId == 5));
+            Assert.IsTrue(result is NotFoundResult);
         }
 
         private StockController GetStockController()
