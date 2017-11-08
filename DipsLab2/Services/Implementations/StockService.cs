@@ -20,6 +20,7 @@ namespace DipsLab2.Services.Implementations
         {
             var res = Get($"?page={page}&size={size}").Result;
             string response = res.Content.ReadAsStringAsync().Result;
+            //string response = res.Content.ReadAsStringAsync().Result;
 
             try
             {

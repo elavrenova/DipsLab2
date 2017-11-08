@@ -1,17 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2005
+VisualStudioVersion = 15.0.27004.2006
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DipsLab2", "DipsLab2\DipsLab2.csproj", "{3E19B9CE-948E-4F22-B5E0-E7D53CE31719}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderService", "OrderService\OrderService.csproj", "{8763DBB0-8FDC-43BF-A33F-7AB1A3AD5076}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StockService", "StockService\StockService.csproj", "{48990CE3-7048-48E7-8FE0-17E2842B1062}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TransferService", "TransferService\TransferService.csproj", "{2054FF88-49E0-4EAE-BEA0-646C34AD2A6F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{95F9C05D-276B-417C-92B5-CDD4871FB804}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{95F9C05D-276B-417C-92B5-CDD4871FB804}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +21,6 @@ Global
 		{3E19B9CE-948E-4F22-B5E0-E7D53CE31719}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E19B9CE-948E-4F22-B5E0-E7D53CE31719}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E19B9CE-948E-4F22-B5E0-E7D53CE31719}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8763DBB0-8FDC-43BF-A33F-7AB1A3AD5076}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8763DBB0-8FDC-43BF-A33F-7AB1A3AD5076}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8763DBB0-8FDC-43BF-A33F-7AB1A3AD5076}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8763DBB0-8FDC-43BF-A33F-7AB1A3AD5076}.Release|Any CPU.Build.0 = Release|Any CPU
 		{48990CE3-7048-48E7-8FE0-17E2842B1062}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{48990CE3-7048-48E7-8FE0-17E2842B1062}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48990CE3-7048-48E7-8FE0-17E2842B1062}.Release|Any CPU.ActiveCfg = Release|Any CPU

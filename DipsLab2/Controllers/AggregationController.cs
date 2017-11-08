@@ -59,12 +59,6 @@ namespace DipsLab2.Controllers
                 return BadRequest("All transfers are busy");
             }
             item.OrderStatus += 1;
-            //var ordResp = await orderService.AddOrder(item);
-            //if (ordResp?.StatusCode == System.Net.HttpStatusCode.NoContent)
-            //{
-            //    item.OrderStatus = 44;
-            //    return NoContent();
-            //}
             return Ok();
         }
     
@@ -98,11 +92,11 @@ namespace DipsLab2.Controllers
         [HttpGet("info")]
         public async Task<List<string>> GetInfo()
         {
-            int page = 1;
-            int size = 5;
+            int page = 0;
+            int size = 0;
             List<string> stockList = stockService.GetAllStocks(page, size);
             List<string> transferList = await transferService.GetAllTransfers(page, size);
-            if (transferList == null || stockList == null)
+            if (transferList.Count == 0 || stockList.Count == 0)
             {
                 return null;
             }
@@ -115,31 +109,6 @@ namespace DipsLab2.Controllers
                 }
                 return stockList;
             }
-        }
-
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody]string value)
-        {
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
         }
     }
 }

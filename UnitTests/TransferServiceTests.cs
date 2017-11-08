@@ -160,9 +160,5 @@ namespace UnitTests
             mockSet.Setup(d => d.Add(It.IsAny<Transfer>())).Callback<Transfer>(u => transfers.Add(u));
             return mockSet.Object;
         }
-        private HttpResponseMessage GetResponseMessage(HttpStatusCode registerCode)
-        {
-            return Mock.Of<HttpResponseMessage>(hwr => hwr.StatusCode == registerCode);
-        }
     }
 }

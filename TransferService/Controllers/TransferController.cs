@@ -25,7 +25,7 @@ namespace TransferService.Controllers
         }
 
         [HttpGet("")]
-        public async Task<List<Transfer>> GetAllTransfers(int page, int size)
+        public async Task<List<string>> GetAllTransfers(int page, int size)
         {
             var transfers = dbcontext.Transfers.Where(s=> true);
             //var transfers = dbcontext.Transfers.AsEnumerable();
@@ -37,19 +37,8 @@ namespace TransferService.Controllers
             {
                 transfers = transfers.Take(size);
             }
-            return transfers.ToList();
+            return transfers.Select(transf => $"{transf.Name}: carrying = {transf.Carrying} , status: {transf.Status}").ToList();
         }
-
-        //[HttpGet("{id}", Name = "GetTransfer")]
-        //public IActionResult GetById(long id)
-        //{
-        //    var item = dbcontext.Transfers.FirstOrDefault(t => t.Id == id);
-        //    if (item == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return new ObjectResult(item);
-        //}
 
         [HttpPost("")]
         public IActionResult AddTransfer(TransferModel item)
@@ -120,19 +109,5 @@ namespace TransferService.Controllers
             dbcontext.SaveChanges();
             return Ok();
         }
-
-        //[HttpDelete("{id}")]
-        //public IActionResult Delete(long id)
-        //{
-        //    var trans = dbcontext.Transfers.FirstOrDefault(t => t.Id == id);
-        //    if (trans == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    dbcontext.Transfers.Remove(trans);
-        //    dbcontext.SaveChanges();
-        //    return new NoContentResult();
-        //}
     }
 }
