@@ -6,24 +6,28 @@ using System.Threading.Tasks;
 using DipsLab2.Models;
 using DipsLab2.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace DipsLab2.Controllers
 {
     [Route("")]
     public class AggregationController : Controller
     {
-        private IOrderService orderService;
+        //private IOrderService orderService;
         private IStockService stockService;
         private ITransferService transferService;
+        private ILogger<AggregationController> logger;
 
         public AggregationController(
-            IOrderService orderService,
+            //IOrderService orderService,
             IStockService stockService,
-            ITransferService transferService)
+            ITransferService transferService,
+            ILogger<AggregationController> logger)
         {
-            this.orderService = orderService;
+            //this.orderService = orderService;
             this.stockService = stockService;
             this.transferService = transferService;
+            this.logger = logger;
         }
 
 
@@ -87,7 +91,7 @@ namespace DipsLab2.Controllers
                 return BadRequest("Can't find transfer for refuse");
             }
             item.OrderStatus += 9;
-            var orderRes = orderService.UpdateOrder(item);
+            //var orderRes = orderService.UpdateOrder(item);
             return Ok();
         }
 

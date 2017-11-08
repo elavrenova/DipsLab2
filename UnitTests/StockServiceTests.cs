@@ -105,6 +105,28 @@ namespace UnitTests
             Assert.IsTrue(result is NotFoundResult);
         }
 
+        [TestMethod]
+        public void TestRefuseStockValid()
+        {
+            var stocks = new List<Stock> { new Stock { FreePlace = freeplace } };
+            dbContext = GetDbContext(stocks);
+            var stockController = GetStockController();
+
+            var result = stockController.RefuseStock(Mock.Of<StockTransferOrderModel>(x => x.Value == 50.0));
+            Assert.IsTrue(result is OkResult);
+        }
+
+        [TestMethod]
+        public void TestRefuseStockNotFound()
+        {
+            var stocks = new List<Stock> { new Stock { Id = id } };
+            dbContext = GetDbContext(stocks);
+            var stockController = GetStockController();
+
+            var result = stockController.RefuseStock(Mock.Of<StockTransferOrderModel>(x => x.StockId == 5));
+            Assert.IsTrue(result is NotFoundResult);
+        }
+
         private StockController GetStockController()
         {
             return new StockController(dbContext, logger);

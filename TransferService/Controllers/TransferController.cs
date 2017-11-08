@@ -73,7 +73,7 @@ namespace TransferService.Controllers
         public IActionResult BookTransfer([FromBody]StockTransferOrderModel item)
         {
             var trans = dbcontext.Transfers;
-            if (trans == null)
+            if (trans.Count() == 0)
             {
                 return NoContent();
             }
@@ -103,7 +103,7 @@ namespace TransferService.Controllers
         [HttpPut("refuset")]
         public IActionResult RefuseTransfer([FromBody]StockTransferOrderModel item)
         {
-            if (item == null)
+            if (item.TransferId == 0)
             {
                 return NoContent();
             }

@@ -20,6 +20,7 @@ namespace UnitTests
     [TestClass]
     public class TransferServiceTests
     {
+        private const double carrying = 5000.0;
         private TransferContext dbContext;
         private ILogger<TransferController> logg;
 
@@ -69,6 +70,69 @@ namespace UnitTests
 
             var result = transferController.AddTransfer(Mock.Of<TransferModel>());
             Assert.IsFalse(result is OkResult);
+        }
+
+        [TestMethod]
+        public void TestBookTransferValid()
+        {
+            var transfers = new List<Transfer> { new Transfer { Carrying = carrying, Status = 0, Id = 1} };
+            dbContext = GetDbContext(transfers);
+            var transferController = GetTransferController();
+
+            var result = transferController.BookTransfer(Mock.Of<StockTransferOrderModel>(x => x.Value == 500.0));
+            Assert.IsTrue(result is OkResult);
+        }
+        [TestMethod]
+        public void TestBookTransferNotValidBusy()
+        {
+            var transfers = new List<Transfer> { new Transfer { Carrying = carrying, Status = 1 } };
+            dbContext = GetDbContext(transfers);
+            var transferController = GetTransferController();
+
+            var result = transferController.BookTransfer(Mock.Of<StockTransferOrderModel>(x => x.Value == 500.0));
+            Assert.IsTrue(result is BadRequestObjectResult);
+        }
+
+        [TestMethod]
+        public void TestBookTransferNotValidEmpty()
+        {
+            var transferController = GetTransferController();
+
+            var result = transferController.BookTransfer(Mock.Of<StockTransferOrderModel>(x => x.Value == 500.0));
+            Assert.IsTrue(result is NoContentResult);
+        }
+
+        [TestMethod]
+        public void TestRefuseTransferValid()
+        {
+            var transfers = new List<Transfer> { new Transfer { Carrying = carrying, Status = 1, Id = 1 } };
+            dbContext = GetDbContext(transfers);
+            var transferController = GetTransferController();
+
+            var result = transferController.RefuseTransfer(Mock.Of<StockTransferOrderModel>(x => x.TransferId == 1));
+            Assert.IsTrue(result is OkResult);
+        }
+
+        [TestMethod]
+        public void TestRefuseTransferNotValidNotFound()
+        {
+            var transfers = new List<Transfer> { new Transfer { Carrying = carrying, Status = 1, Id = 1 } };
+            dbContext = GetDbContext(transfers);
+            var transferController = GetTransferController();
+
+            var result = transferController.RefuseTransfer(Mock.Of<StockTransferOrderModel>(x => x.TransferId == 5));
+            Assert.IsTrue(result is NotFoundResult);
+        }
+
+        [TestMethod]
+        public void TestRefuseTransferNotValidNullItem()
+        {
+            var transfers = new List<Transfer> { new Transfer { Carrying = carrying, Status = 1, Id = 1 } };
+            dbContext = GetDbContext(transfers);
+            var transferController = GetTransferController();
+
+            var result = transferController.RefuseTransfer(Mock.Of<StockTransferOrderModel>());
+            Assert.IsTrue(result is NoContentResult);
         }
 
 
