@@ -25,7 +25,7 @@ namespace TransferService.Controllers
         }
 
         [HttpGet("")]
-        public async Task<List<string>> GetAllTransfers(int page, int size)
+        public async Task<IActionResult> GetAllTransfers(int page, int size)
         {
             var transfers = dbcontext.Transfers.Where(s=> true);
             //var transfers = dbcontext.Transfers.AsEnumerable();
@@ -37,7 +37,7 @@ namespace TransferService.Controllers
             {
                 transfers = transfers.Take(size);
             }
-            return transfers.Select(transf => $"{transf.Name}: carrying = {transf.Carrying} , status: {transf.Status}").ToList();
+            return StatusCode(200,transfers.Select(transf => $"{transf.Name}: carrying = {transf.Carrying} , status: {transf.Status}").ToList());
         }
 
         [HttpPost("")]

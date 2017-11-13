@@ -24,7 +24,7 @@ namespace StockService.Controllers
         }
 
         [HttpGet("")]
-        public List<string> GetAllStocks(int page, int size)
+        public async Task<IActionResult> GetAllStocks(int page, int size)
         {
             logger.LogDebug($"Getting list of stocks on page={page} ");
             var stocks = dbcontext.Stocks.Where(s => true);
@@ -40,7 +40,7 @@ namespace StockService.Controllers
                 stocks = stocks.Take(size);
             }
             logger.LogDebug($"Returning {stocks.Count()} stocks");
-            return stocks.Select(stock => $"{stock.Name}: free place = {stock.FreePlace}").ToList();
+            return StatusCode(200,stocks.Select(stock => $"{stock.Name}: free place = {stock.FreePlace}").ToList());
         }
 
         [HttpPost("addstock")]
