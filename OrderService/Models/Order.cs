@@ -8,10 +8,10 @@ namespace OrderService.Models
 {
     public class Order
     {
-        public Order(OrderModel orderModel)
+        public Order(StockTransferOrderModel orderModel)
         {
             this.UserId = orderModel.UserId;
-            this.Status = orderModel.Status;
+            this.Status = orderModel.OrderStatus;
             this.StockId = orderModel.StockId;
             this.TransferId = orderModel.TransferId;
             this.Value = orderModel.Value;

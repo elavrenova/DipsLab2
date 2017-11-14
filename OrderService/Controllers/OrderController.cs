@@ -22,24 +22,22 @@ namespace OrderService.Controllers
             this.dbcontext = context;
         }
 
-        //[HttpGet("")]
-        //public async Task<List<Order>> GetAllOrders(int page, int size)
-        //{
-        //    logger.LogDebug($"Getting list of orders on page={page} ");
-        //    var orders = dbcontext.Orders.Where(s=>true);
-        //    if (size != 0 && page != 0)
-        //    {
-        //        logger.LogDebug($"Looking for page {page} with orders ");
-        //        orders = orders.Skip(size * page);
-        //    }
-        //    if (size != 0)
-        //    {
-        //        logger.LogDebug($"Getting first {size} orders");
-        //        orders = orders.Take(size);
-        //    }
-        //    logger.LogDebug($"Returning {orders.Count()} orders");
-        //    return orders.ToList();
-        //}
+        [HttpGet("")]
+        public async Task<IActionResult> GetAllOrders(int page, int size)
+        {
+            var orders = dbcontext.Orders.Where(s => true);
+            if (size != 0 && page != 0)
+            {
+                
+                orders = orders.Skip(size * page);
+            }
+            if (size != 0)
+            {
+                
+                orders = orders.Take(size);
+            }
+            return StatusCode(200,orders.Select(ord => $"stock:{ord.StockId} transfer:{ord.TransferId} value:{ord.Value} userId:{ord.UserId} status:{ord.Status} orderId:{ord.Id}").ToList());
+        }
 
         //[HttpGet("getorder/{id}")]
         //public IActionResult GetById(long id)
@@ -55,50 +53,68 @@ namespace OrderService.Controllers
         //    return new ObjectResult(item);
         //}
 
-        //[HttpPost("")]
-        //public async Task<IActionResult> AddOrder(StockTransferOrderModel item)
-        //{
-        //    if (item == null)
-        //    {
-        //        logger.LogDebug($"Info for creating order is empty");
-        //        return NoContent();
-        //    }
+        [HttpPost("")]
+        public async Task<IActionResult> AddOrder(StockTransferOrderModel item)
+        {
+            if (item == null)
+            {
+                logger.LogDebug($"Info for creating order is empty");
+                return StatusCode(204,"the item for adding is empty");
+            }
 
-        //    dbcontext.Orders.Add(new Order()
-        //    {
-        //        Status = item.OrderStatus,
-        //        StockId = item.StockId,
-        //        TransferId = item.TransferId,
-        //        UserId = item.UserId,
-        //        Value = item.Value
-        //    });
-        //    dbcontext.SaveChanges();
-        //    return Ok();
-        //}
+            dbcontext.Orders.Add(new Order()
+            {
+                Status = item.OrderStatus,
+                StockId = item.StockId,
+                TransferId = item.TransferId,
+                UserId = item.UserId,
+                Value = item.Value
+            });
+            dbcontext.SaveChanges();
+            return Ok();
+        }
 
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> UpdateOrder( StockTransferOrderModel item)
-        //{
-        //    if (item == null)
-        //    {
-        //        return NoContent();
-        //    }
+        [HttpPut("")]
+        public async Task<IActionResult> RefuseOrder(StockTransferOrderModel item)
+        {
+            if (item == null)
+            {
+                return NoContent();
+            }
+            var ord = dbcontext.Orders.FirstOrDefault(t => t.Id == item.OrderId);
+            if (ord == null)
+            {
+                return NotFound();
+            }
+            ord.Status = item.OrderStatus;
+            dbcontext.Orders.Update(ord);
+            dbcontext.SaveChanges();
+            return new NoContentResult();
+        }
 
-        //    var ord = dbcontext.Orders.FirstOrDefault(t => t.Id == item.Id);
-        //    if (ord == null)
-        //    {
-        //        return NotFound();
-        //    }
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateOrder(StockTransferOrderModel item)
+        {
+            if (item == null)
+            {
+                return NoContent();
+            }
 
-        //    ord.UserId = item.UserId;
-        //    ord.StockId = item.StockId;
-        //    ord.Value = item.Value;
-        //    ord.Status = item.TransferStatus;
+            var ord = dbcontext.Orders.FirstOrDefault(t => t.Id == item.OrderId);
+            if (ord == null)
+            {
+                return NotFound();
+            }
 
-        //    dbcontext.Orders.Update(ord);
-        //    dbcontext.SaveChanges();
-        //    return new NoContentResult();
-        //}
+            ord.UserId = item.UserId;
+            ord.StockId = item.StockId;
+            ord.Value = item.Value;
+            ord.Status = item.OrderStatus;
+
+            dbcontext.Orders.Update(ord);
+            dbcontext.SaveChanges();
+            return new NoContentResult();
+        }
 
         //[HttpDelete("{id}")]
         //public IActionResult Delete(long id)

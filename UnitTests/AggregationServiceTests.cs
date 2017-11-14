@@ -20,6 +20,7 @@ namespace UnitTests
     {
         private ILogger<AggregationController> logger;
         private IStockService stockService;
+        private IOrderService orderService;
         private ITransferService transferService;
 
         [TestInitialize]
@@ -29,6 +30,7 @@ namespace UnitTests
             logger = loggerMock.Object;
             stockService = GetStockService();
             transferService = GetTransferService();
+            orderService = GetEmptyOrderService();
         }
 
         [TestMethod]
@@ -37,8 +39,9 @@ namespace UnitTests
             stockService = GetStockService(Code: HttpStatusCode.OK);
             transferService = GetTransferService(Code: HttpStatusCode.OK);
             var aggregationController = GetAggregationController();
-
-            var result = aggregationController.AddOrder(Mock.Of<StockTransferOrderModel>(m => m.StockId == 1 && m.Value == 50.0)).Result;
+            int stockId = 1;
+            double value = 50.0;
+            var result = aggregationController.AddOrder(stockId,value).Result;
             Assert.IsTrue(result is OkResult);
         }
 
@@ -48,8 +51,10 @@ namespace UnitTests
             stockService = GetStockService(Code: HttpStatusCode.OK);
             transferService = GetTransferService(Code: HttpStatusCode.OK);
             var aggregationController = GetAggregationController();
-
-            var result = aggregationController.RefuseOrder(Mock.Of<StockTransferOrderModel>(m => m.StockId == 1 && m.Value == 50.0)).Result;
+            int stockId = 1;
+            double value = 50.0;
+            int transferId = 1;
+            var result = aggregationController.RefuseOrder(stockId,value,transferId).Result;
             Assert.IsTrue(result is OkResult);
         }
 
@@ -59,8 +64,9 @@ namespace UnitTests
             stockService = GetStockService(Code: HttpStatusCode.NotFound);
             transferService = GetTransferService(Code: HttpStatusCode.OK);
             var aggregationController = GetAggregationController();
-
-            var result = aggregationController.AddOrder(Mock.Of<StockTransferOrderModel>(m => m.StockId == 1 && m.Value == 50.0)).Result;
+            int stockId = 1;
+            double value = 50.0;
+            var result = aggregationController.AddOrder(stockId,value).Result;
             Assert.IsTrue(result is BadRequestObjectResult);
         }
 
@@ -70,8 +76,10 @@ namespace UnitTests
             stockService = GetStockService(Code: HttpStatusCode.NotFound);
             transferService = GetTransferService(Code: HttpStatusCode.OK);
             var aggregationController = GetAggregationController();
-
-            var result = aggregationController.RefuseOrder(Mock.Of<StockTransferOrderModel>(m => m.StockId == 1 && m.Value == 50.0)).Result;
+            int stockId = 1;
+            double value = 50.0;
+            int transferId = 1;
+            var result = aggregationController.RefuseOrder(stockId,value,transferId).Result;
             Assert.IsTrue(result is BadRequestObjectResult);
         }
 
@@ -82,8 +90,9 @@ namespace UnitTests
             stockService = GetStockService(Code: HttpStatusCode.BadRequest);
             transferService = GetTransferService(Code: HttpStatusCode.OK);
             var aggregationController = GetAggregationController();
-
-            var result = aggregationController.AddOrder(Mock.Of<StockTransferOrderModel>(m => m.StockId == 1 && m.Value == 50.0)).Result;
+            int stockId = 1;
+            double value = 50.0;
+            var result = aggregationController.AddOrder(stockId,value).Result;
             Assert.IsTrue(result is BadRequestObjectResult);
         }
 
@@ -93,8 +102,9 @@ namespace UnitTests
             stockService = GetStockService(Code: HttpStatusCode.OK);
             transferService = GetTransferService(Code: HttpStatusCode.NoContent);
             var aggregationController = GetAggregationController();
-
-            var result = aggregationController.AddOrder(Mock.Of<StockTransferOrderModel>(m => m.StockId == 1 && m.Value == 50.0)).Result;
+            int stockId = 1;
+            double value = 50.0;
+            var result = aggregationController.AddOrder(stockId,value).Result;
             Assert.IsTrue(result is BadRequestObjectResult);
         }
 
@@ -104,8 +114,10 @@ namespace UnitTests
             stockService = GetStockService(Code: HttpStatusCode.OK);
             transferService = GetTransferService(Code: HttpStatusCode.NoContent);
             var aggregationController = GetAggregationController();
-
-            var result = aggregationController.RefuseOrder(Mock.Of<StockTransferOrderModel>(m => m.StockId == 1 && m.Value == 50.0)).Result;
+            int stockId = 1;
+            double value = 50.0;
+            int transferId = 1;
+            var result = aggregationController.RefuseOrder(stockId,value,transferId).Result;
             Assert.IsTrue(result is BadRequestObjectResult);
         }
 
@@ -115,8 +127,9 @@ namespace UnitTests
             stockService = GetStockService(Code: HttpStatusCode.OK);
             transferService = GetTransferService(Code: HttpStatusCode.BadRequest);
             var aggregationController = GetAggregationController();
-
-            var result = aggregationController.AddOrder(Mock.Of<StockTransferOrderModel>(m => m.StockId == 1 && m.Value == 50.0)).Result;
+            int stockId = 1;
+            double value = 50.0;
+            var result = aggregationController.AddOrder(stockId,value).Result;
             Assert.IsTrue(result is BadRequestObjectResult);
         }
 
@@ -126,8 +139,10 @@ namespace UnitTests
             stockService = GetStockService(Code: HttpStatusCode.OK);
             transferService = GetTransferService(Code: HttpStatusCode.NotFound);
             var aggregationController = GetAggregationController();
-
-            var result = aggregationController.RefuseOrder(Mock.Of<StockTransferOrderModel>(m => m.StockId == 1 && m.Value == 50.0)).Result;
+            int stockId = 1;
+            double value = 50.0;
+            int transferId = 1;
+            var result = aggregationController.RefuseOrder(stockId,value,transferId).Result;
             Assert.IsTrue(result is BadRequestObjectResult);
         }
 
@@ -136,13 +151,14 @@ namespace UnitTests
         {
             var stocks = new List<string> { "stock1", "stock2" };
             stockService = GetStockService(stocks);
-            var transfers = new List<string> {"tr1", "tr2" };
+            var transfers = new List<string> { "tr1", "tr2" };
             transferService = GetTransferService(transfers);
-            var stocksandtransfers = new List<string> { "stock1", "stock2","*","tr1","tr2" };
+            var stocksandtransfers = new List<string> { "stock1", "stock2", "*", "tr1", "tr2" };
             var aggregationController = GetAggregationController();
-
-            var result = aggregationController.GetInfo().Result;
-            Assert.AreEqual(stocksandtransfers.Count, result.Count);
+            int page = 0;
+            int size = 0;
+            var result = aggregationController.GetInfo(page,size).Result;
+            Assert.AreEqual(stocksandtransfers.Count, result);
         }
 
         [TestMethod]
@@ -154,21 +170,23 @@ namespace UnitTests
             transferService = GetTransferService(transfers);
             var stocksandtransfers = new List<string> { };
             var aggregationController = GetAggregationController();
-
-            var result = aggregationController.GetInfo().Result;
+            int page = 0;
+            int size = 0;
+            var result = aggregationController.GetInfo(page,size).Result;
             Assert.AreEqual(null, result);
         }
 
-        //[TestMethod]
-        //public void TestAddOrderNotValidEmptyStockService()
-        //{
-        //    stockService = GetEmptyStockService();
-        //    transferService = GetTransferService(Code: HttpStatusCode.OK);
-        //    var aggregationController = GetAggregationController();
-
-        //    var result = aggregationController.AddOrder(Mock.Of<StockTransferOrderModel>(m => m.StockId == 1 && m.Value == 50.0)).Result;
-        //    Assert.IsTrue(result is BadRequestObjectResult);
-        //}
+        [TestMethod]
+        public void TestAddOrderNotValidEmptyStockService()
+        {
+            stockService = GetEmptyStockService();
+            transferService = GetTransferService(Code: HttpStatusCode.OK);
+            var aggregationController = GetAggregationController();
+            int stockId = 1;
+            double value = 50.0;
+            var result = aggregationController.AddOrder(stockId, value).Result;
+            Assert.IsTrue(result is BadRequestObjectResult);
+        }
 
 
         private IStockService GetStockService(List<string> getStocks = null, HttpStatusCode Code = HttpStatusCode.OK)
@@ -183,12 +201,17 @@ namespace UnitTests
             return Mock.Of<ITransferService>(s =>
                 s.RefuseTransfer(It.IsAny<StockTransferOrderModel>()) == Task.FromResult(GetResponseMessage(Code)) &&
                 s.BookTransfer(It.IsAny<StockTransferOrderModel>()) == Task.FromResult(GetResponseMessage(Code)) &&
-                s.GetAllTransfers(It.IsAny<int>(), It.IsAny<int>()) == Task.FromResult(getTransfers));
+                s.GetAllTransfers(It.IsAny<int>(), It.IsAny<int>()) == getTransfers);
         }
 
         private IStockService GetEmptyStockService()
         {
             return Mock.Of<IStockService>();
+        }
+
+        private IOrderService GetEmptyOrderService()
+        {
+            return Mock.Of<IOrderService>();
         }
 
         private ITransferService GetEmptyTransferService()
@@ -198,7 +221,7 @@ namespace UnitTests
 
         private AggregationController GetAggregationController()
         {
-            return new AggregationController(stockService, transferService, logger);
+            return new AggregationController(orderService,stockService, transferService, logger);
         }
 
         private HttpResponseMessage GetResponseMessage(HttpStatusCode registerCode)

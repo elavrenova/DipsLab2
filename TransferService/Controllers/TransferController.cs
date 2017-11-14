@@ -58,8 +58,8 @@ namespace TransferService.Controllers
             return BadRequest(); 
         }
 
-        [HttpPut("bookt")]
-        public IActionResult BookTransfer([FromBody]StockTransferOrderModel item)
+        [HttpPut("find_transfer")]
+        public IActionResult FindTransfer(StockTransferOrderModel item)
         {
             var trans = dbcontext.Transfers;
             if (trans.Count() == 0)
@@ -89,7 +89,22 @@ namespace TransferService.Controllers
             return Ok();
         }
 
-        [HttpPut("refuset")]
+        [HttpPut("book_transfer")]
+        public IActionResult BookTransfer(StockTransferOrderModel item)
+        {
+            var trans = dbcontext.Transfers;
+            var transfer = trans.FirstOrDefault(t => t.Id == item.TransferId);
+            if (transfer == null)
+            {
+                return StatusCode(404, "There is no transfer with such id");
+            }
+            transfer.Status = 1;
+            dbcontext.Transfers.Update(transfer);
+            dbcontext.SaveChanges();
+            return Ok();
+        }
+
+        [HttpPut("refuse_transfer")]
         public IActionResult RefuseTransfer([FromBody]StockTransferOrderModel item)
         {
             if (item.TransferId == 0)
@@ -100,7 +115,7 @@ namespace TransferService.Controllers
             var trans = dbcontext.Transfers.FirstOrDefault(t => t.Id == item.TransferId);
             if (trans == null)
             {
-                return NotFound();
+                return StatusCode(404,"Transfer with such id wasn't found");
             }
 
             trans.Status = 0;
