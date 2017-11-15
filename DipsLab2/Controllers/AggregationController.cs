@@ -35,11 +35,15 @@ namespace DipsLab2.Controllers
 
 
         [HttpPost("order")]
-        public async Task<IActionResult> AddOrder(int stockId, double value)
+        public async Task<IActionResult> AddOrder(int? stockId, double? value)
         {
+            if (stockId == null || value == null)
+            {
+                return StatusCode(500, "Parameters are invalid");
+            }
             var item = new StockTransferOrderModel();
-            item.StockId = stockId;
-            item.Value = value;
+            item.StockId = stockId.GetValueOrDefault();
+            item.Value = value.GetValueOrDefault();
 
             var stockResp = await stockService.BookStock(item);
             if (stockResp == null)
@@ -58,10 +62,10 @@ namespace DipsLab2.Controllers
             }
             item.OrderStatus = 10;
             var transfResp = await transferService.FindTransfer(item);
-            if (transfResp == null)
+            if (transfResp?.StatusCode == System.Net.HttpStatusCode.Forbidden)
             {
                 stockResp = await stockService.RefuseStock(item);
-                return StatusCode(503, "TransferService is unavailable");
+                return StatusCode(503, "TransferService is unavailable, so recall of refusing stock was made");
             }
             if (transfResp?.StatusCode == System.Net.HttpStatusCode.NoContent)
             {
@@ -82,12 +86,16 @@ namespace DipsLab2.Controllers
 
 
         [HttpPut("refuse")]
-        public async Task<IActionResult> RefuseOrder(int stockId, double value, int transferId)
+        public async Task<IActionResult> RefuseOrder(int? stockId, double? value, int? transferId)
         {
+            if (stockId == null || value == null || transferId == null)
+            {
+                return StatusCode(500, "Parameters are invalid");
+            }
             var item = new StockTransferOrderModel();
-            item.StockId = stockId;
-            item.Value = value;
-            item.TransferId = transferId;
+            item.StockId = stockId.GetValueOrDefault();
+            item.Value = value.GetValueOrDefault();
+            item.TransferId = transferId.GetValueOrDefault();
 
             var stockResp = await stockService.RefuseStock(item);
             var transfResp = await transferService.RefuseTransfer(item);
@@ -111,8 +119,9 @@ namespace DipsLab2.Controllers
                                     await transferService.BookTransfer(item);
                                 if (transfResp?.StatusCode == System.Net.HttpStatusCode.Forbidden)
                                     await stockService.BookStock(item);
+                                return false;
                             }
-                            return false;
+                            return true;
                         }
                         catch
                         {
