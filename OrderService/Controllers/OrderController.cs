@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DipsLab2.Models;
+using Gateway.Models;
 using Microsoft.AspNetCore.Mvc;
 using OrderService.Models;
 using Microsoft.Extensions.Logging;

@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using DipsLab2.Models;
 using Microsoft.AspNetCore.Mvc;
 using TransferService.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Gateway.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -40,23 +38,23 @@ namespace TransferService.Controllers
             return StatusCode(200,await transfers.Select(transf => $"{transf.Name}: carrying = {transf.Carrying} , status: {transf.Status}").ToListAsync());
         }
 
-        [HttpPost("")]
-        public IActionResult AddTransfer(TransferModel item)
-        {
-            var prevTransf = dbcontext.Transfers.FirstOrDefault(n => n.Name == item.Name && n.Carrying == item.Carrying);
-            if (prevTransf == null)
-            {
-                dbcontext.Transfers.Add(new Transfer(item)
-                {
-                    Name = item.Name,
-                    Carrying = item.Carrying,
-                    Status = item.Status
-                });
-                dbcontext.SaveChanges();
-                return Ok();
-            }
-            return BadRequest(); 
-        }
+        //[HttpPost("")]
+        //public IActionResult AddTransfer(TransferModel item)
+        //{
+        //    var prevTransf = dbcontext.Transfers.FirstOrDefault(n => n.Name == item.Name && n.Carrying == item.Carrying);
+        //    if (prevTransf == null)
+        //    {
+        //        dbcontext.Transfers.Add(new Transfer(item)
+        //        {
+        //            Name = item.Name,
+        //            Carrying = item.Carrying,
+        //            Status = item.Status
+        //        });
+        //        dbcontext.SaveChanges();
+        //        return Ok();
+        //    }
+        //    return BadRequest(); 
+        //}
 
         [HttpPut("find_transfer")]
         public IActionResult FindTransfer(StockTransferOrderModel item)

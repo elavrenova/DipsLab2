@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Gateway.Controllers
 {
+    //[Route("")]
     public class HomeController : Controller
     {
         private IOrderService orderService;

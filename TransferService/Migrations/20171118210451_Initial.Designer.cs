@@ -11,14 +11,14 @@ using TransferService.Models;
 namespace TransferService.Migrations
 {
     [DbContext(typeof(TransferContext))]
-    [Migration("20171023171150_001t")]
-    partial class _001t
+    [Migration("20171118210451_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.0.0-rtm-26452")
+                .HasAnnotation("ProductVersion", "2.0.1-rtm-125")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("TransferService.Models.Transfer", b =>

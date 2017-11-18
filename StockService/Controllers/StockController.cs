@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using DipsLab2.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StockService.Models;
 using Microsoft.Extensions.Logging;
+using Gateway.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -44,22 +41,22 @@ namespace StockService.Controllers
             return StatusCode(200, await stocks.Select(stock => $"{stock.Name}: free place = {stock.FreePlace}").ToListAsync());
         }
 
-        [HttpPost("addstock")]
-        public IActionResult AddStock(StockModel item)
-        {
-            logger.LogDebug($"Looking for stock with the same info");
-            var prevStock = dbcontext.Stocks.FirstOrDefault(n => n.Name == item.Name && n.FreePlace == item.FreePlace);
-            if (prevStock == null)
-            {
-                logger.LogDebug($"Adding new stock");
-                dbcontext.Stocks.Add(new Stock(item));
-                logger.LogDebug($"Saving changes in db");
-                dbcontext.SaveChanges();
-                return Ok();
-            }
-            logger.LogDebug($"There is a stock with the same info");
-            return BadRequest();
-        }
+        //[HttpPost("addstock")]
+        //public IActionResult AddStock(StockModel item)
+        //{
+        //    logger.LogDebug($"Looking for stock with the same info");
+        //    var prevStock = dbcontext.Stocks.FirstOrDefault(n => n.Name == item.Name && n.FreePlace == item.FreePlace);
+        //    if (prevStock == null)
+        //    {
+        //        logger.LogDebug($"Adding new stock");
+        //        dbcontext.Stocks.Add(new Stock(item));
+        //        logger.LogDebug($"Saving changes in db");
+        //        dbcontext.SaveChanges();
+        //        return Ok();
+        //    }
+        //    logger.LogDebug($"There is a stock with the same info");
+        //    return BadRequest();
+        //}
 
         [HttpPut("books")]
         public IActionResult BookStock([FromBody]StockTransferOrderModel item)
