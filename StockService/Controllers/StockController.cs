@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using DipsLab2.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using StockService.Models;
 using Microsoft.Extensions.Logging;
 
@@ -40,7 +41,7 @@ namespace StockService.Controllers
                 stocks = stocks.Take(size);
             }
             logger.LogDebug($"Returning {stocks.Count()} stocks");
-            return StatusCode(200,stocks.Select(stock => $"{stock.Name}: free place = {stock.FreePlace}").ToList());
+            return StatusCode(200, await stocks.Select(stock => $"{stock.Name}: free place = {stock.FreePlace}").ToListAsync());
         }
 
         [HttpPost("addstock")]

@@ -37,7 +37,7 @@ namespace TransferService.Controllers
             {
                 transfers = transfers.Take(size);
             }
-            return StatusCode(200,transfers.Select(transf => $"{transf.Name}: carrying = {transf.Carrying} , status: {transf.Status}").ToList());
+            return StatusCode(200,await transfers.Select(transf => $"{transf.Name}: carrying = {transf.Carrying} , status: {transf.Status}").ToListAsync());
         }
 
         [HttpPost("")]

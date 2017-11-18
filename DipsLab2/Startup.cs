@@ -40,7 +40,11 @@ namespace DipsLab2
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMvc();
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute("default", "{controller=Aggregation}/{action=GetInfo}/{id?}");
+            });
+
         }
     }
 }

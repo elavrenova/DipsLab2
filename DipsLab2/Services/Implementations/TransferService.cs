@@ -14,10 +14,10 @@ namespace DipsLab2.Services.Implementations
         public TransferService(IConfiguration configuration) : 
             base(configuration.GetSection("Urls")["Transf"]) { }
 
-        public List<string> GetAllTransfers(int page, int size)
+        public async Task<List<string>> GetAllTransfers(int page, int size)
         {
-            var res = Get($"?page={page}&size={size}").Result;
-            string response = res.Content.ReadAsStringAsync().Result;
+            var res = await Get($"?page={page}&size={size}");
+            string response = await res.Content.ReadAsStringAsync();
             try
             {
                 return JsonConvert.DeserializeObject<List<string>>(response);

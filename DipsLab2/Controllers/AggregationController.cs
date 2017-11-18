@@ -158,13 +158,29 @@ namespace DipsLab2.Controllers
         [HttpGet("info")]
         public async Task<IActionResult> GetInfo(int? page, int? size)
         {
+            
             if (page == null || size == null)
             {
-                return StatusCode(500,"Parameters are not valid");
+                var msg = "";
+                if (page == null)
+                {
+                    if (size == null)
+                        msg = "Parameters page and size are invalid";
+                    else
+                    {
+                        msg = "Page parameter is not valid";
+                    }
+                }  
+                else
+                {
+                    msg = "Size parameter is invalid";
+                }
+
+                return RedirectToAction("Error400",new{msg});
             }
             var message = string.Empty;
-            List<string> stockList = stockService.GetAllStocks(page.GetValueOrDefault(), size.GetValueOrDefault());
-            List<string> transferList = transferService.GetAllTransfers(page.GetValueOrDefault(), size.GetValueOrDefault());
+            List<string> stockList = await stockService.GetAllStocks(page.GetValueOrDefault(), size.GetValueOrDefault());
+            List<string> transferList = await transferService.GetAllTransfers(page.GetValueOrDefault(), size.GetValueOrDefault());
             if (transferList == null)
             {
                 logger.LogCritical("TransferService is unavailable");
@@ -177,13 +193,16 @@ namespace DipsLab2.Controllers
                 }
                 return StatusCode(200, stockList);
             }
-            else
-            {
-                stockList.Add("");
-                foreach (var t in transferList)
-                    stockList.Add(t);
-                return StatusCode(200, stockList);
-            }
+            stockList.Add("");
+            stockList.AddRange(transferList);
+
+            return View(stockList);
+        }
+
+        public IActionResult Error400(string msg)
+        {
+            ViewBag.msg = msg;
+            return View();
         }
     }
 }

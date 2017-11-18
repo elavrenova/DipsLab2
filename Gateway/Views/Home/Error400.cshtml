@@ -1,0 +1,12 @@
+﻿@model object
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+
+<h2 class="text-danger">400 ошибка</h2>
+<p>
+    @ViewBag.msg
+</p>
+<a asp-action="GetInfo">Назад</a>
