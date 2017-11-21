@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Gateway.Controllers;
 using Gateway.Services;
 using Gateway.Services.Implementations;
 using Microsoft.AspNetCore.Builder;
@@ -28,6 +29,7 @@ namespace Gateway
             services.AddTransient<IOrderService, OrderService>();
             services.AddTransient<IStockService, StockService>();
             services.AddTransient<ITransferService, TransferService>();
+            services.AddTransient<AggregationController>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

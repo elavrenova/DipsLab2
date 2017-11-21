@@ -1,0 +1,13 @@
+﻿@model object
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+
+<h2>title</h2>
+<h2 class="text-danger">404 Error</h2>
+<p>
+    @ViewBag.msg
+</p>
+<a asp-action="GetInfo">Return</a>

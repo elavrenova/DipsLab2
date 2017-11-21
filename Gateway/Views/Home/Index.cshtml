@@ -1,4 +1,22 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-<h1>INDEX</h1>
+
+<h1>Главная страница EasyLogistics</h1>
+<hr/>
+<div class="row">
+    <div class="col-md-3">
+        <form asp-controller="Home" asp-action="AddOrder" method="get">
+            <button type="submit" class="btn btn-success">Add order!</button>
+        </form>
+    </div>
+    <div class="col-md-3">
+        <a asp-controller="Home" asp-action="GetInfo" class="btn btn-primary">GetInfo</a>
+    </div>
+    <div class="col-md-3">
+        <form asp-controller="Home" asp-action="RefuseOrder" method="get">
+            <button type="submit" class="btn btn-danger">Refuse order!</button>
+        </form>
+    </div>
+</div>
+

@@ -30,6 +30,20 @@ namespace DipsLab2.Services.Implementations
             }
         }
 
+        public async Task<List<StockModel>> GetStocks(int page, int size)
+        {
+            var res = await Get($"?page={page}&size={size}");
+            string response = await res.Content.ReadAsStringAsync();
+            try
+            {
+                return JsonConvert.DeserializeObject<List<StockModel>>(response);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         //public async Task<HttpResponseMessage> GetStockById(int id, StockModel stock, double val) =>
         //    await PutJson("book_s/" + stock.Id, stock);
 

@@ -1,0 +1,18 @@
+/*body{
+
+    background-color: #eee; 
+    font-family:'Open Sans';
+}*/
+
+table th , table td{
+    text-align: center;
+}
+
+table tr:nth-child(even) {
+    background-color: rgb(110, 188, 186)
+}
+
+.pagination li:hover{
+    cursor: pointer;
+}
+/*.container { margin-top:150px;}*/

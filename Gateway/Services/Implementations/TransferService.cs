@@ -12,15 +12,29 @@ namespace Gateway.Services.Implementations
     public class TransferService : Service, ITransferService
     {
         public TransferService(IConfiguration configuration) : 
-            base(configuration.GetSection("Urls")["Transf"]) { }
+            base("http://transferservicedl2.azurewebsites.net") { }
 
         public async Task<List<string>> GetAllTransfers(int page, int size)
         {
-            var res = await Get($"?page={page}&size={size}");
+            var res = await Get($"get_all_transfers?page={page}&size={size}");
             string response = await res.Content.ReadAsStringAsync();
             try
             {
                 return JsonConvert.DeserializeObject<List<string>>(response);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public async Task<List<TransferModel>> GetTransfers()
+        {
+            var res = await Get($"get_transfers");
+            string response = await res.Content.ReadAsStringAsync();
+            try
+            {
+                return JsonConvert.DeserializeObject<List<TransferModel>>(response).ToList();
             }
             catch
             {

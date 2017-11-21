@@ -1,0 +1,12 @@
+﻿@model object
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+
+<h2 class="text-danger">500 Error</h2>
+<p>
+    @ViewBag.msg
+</p>
+<a asp-action="GetInfo">Return</a>

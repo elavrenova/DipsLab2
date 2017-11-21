@@ -1,10 +1,13 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TransferService.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Gateway.Models;
+using Gateway.Pagination;
+using Newtonsoft.Json;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -22,20 +25,31 @@ namespace TransferService.Controllers
             this.logger = logger;
         }
 
-        [HttpGet("")]
-        public async Task<IActionResult> GetAllTransfers(int page, int size)
+        [HttpGet("get_all_transfers")]
+        public async Task<ListForPagination<string>> GetAllTransfers(int size, int page)
         {
+            int lastPage = 0;
             var transfers = dbcontext.Transfers.Where(s=> true);
-            //var transfers = dbcontext.Transfers.AsEnumerable();
             if (size != 0 && page != 0)
             {
                 transfers = transfers.Skip(size * page);
             }
             if (size != 0)
             {
+                lastPage = transfers.Count() / size + (transfers.Count() % size == 0 ? -1 : 0);
                 transfers = transfers.Take(size);
             }
-            return StatusCode(200,await transfers.Select(transf => $"{transf.Name}: carrying = {transf.Carrying} , status: {transf.Status}").ToListAsync());
+            
+            var str = JsonConvert.SerializeObject(transfers);
+            return new ListForPagination<string>(str,size,page,lastPage);
+        }
+
+        [HttpGet("get_transfers")]
+        public async Task<string> GetTransfers()
+        {
+            var transfers = dbcontext.Transfers.Where(s => true).ToList();
+            var str = JsonConvert.SerializeObject(transfers);
+            return str;
         }
 
         //[HttpPost("")]
@@ -93,9 +107,7 @@ namespace TransferService.Controllers
             var trans = dbcontext.Transfers;
             var transfer = trans.FirstOrDefault(t => t.Id == item.TransferId);
             if (transfer == null)
-            {
                 return StatusCode(404, "There is no transfer with such id");
-            }
             transfer.Status = 1;
             dbcontext.Transfers.Update(transfer);
             dbcontext.SaveChanges();
@@ -106,16 +118,10 @@ namespace TransferService.Controllers
         public IActionResult RefuseTransfer([FromBody]StockTransferOrderModel item)
         {
             if (item.TransferId == 0)
-            {
                 return NoContent();
-            }
-
             var trans = dbcontext.Transfers.FirstOrDefault(t => t.Id == item.TransferId);
             if (trans == null)
-            {
                 return StatusCode(404,"Transfer with such id wasn't found");
-            }
-
             trans.Status = 0;
 
             dbcontext.Transfers.Update(trans);

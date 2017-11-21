@@ -33,3 +33,40 @@
         display: none;
     }
 }
+
+.navbar-default {
+    background-color: rgb(110, 188, 186);
+}
+
+.navbar-default .navbar-brand:hover,
+.navbar-default .navbar-brand:focus {
+    color: #ffffff;
+    background-color: #497b79;
+}
+
+.navbar-default .navbar-text {
+    color: #000000;
+}
+
+.navbar-default .navbar-nav > li > a {
+    color: #000000;
+}
+
+    .navbar-default .navbar-nav > li > a:hover,
+    .navbar-default .navbar-nav > li > a:focus {
+        color: #ffffff;
+        background-color: #497b79;
+    }
+
+    .navbar-default .navbar-nav > li > .dropdown-menu {
+        background-color: #497b79;
+    }
+
+.navbar-default .navbar-toggle .icon-bar {
+    background-color: #ffffff;
+}
+
+th {
+    background-color: #497b79;
+    color: white;
+}

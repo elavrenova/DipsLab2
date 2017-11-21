@@ -1,10 +1,14 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StockService.Models;
 using Microsoft.Extensions.Logging;
 using Gateway.Models;
+using Gateway.Pagination;
+using Newtonsoft.Json;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -21,24 +25,35 @@ namespace StockService.Controllers
             this.dbcontext = context;
         }
 
-        [HttpGet("")]
-        public async Task<IActionResult> GetAllStocks(int page, int size)
+        [HttpGet("get_all_stocks")]
+        public async Task<ListForPagination<string>> GetAllStocks(int size, int page)
         {
+            int lastPage = 0;
             logger.LogDebug($"Getting list of stocks on page={page} ");
             var stocks = dbcontext.Stocks.Where(s => true);
-            //var stocks = dbcontext.Stocks.AsEnumerable();
             if (size != 0 && page != 0)
-            {
+            { 
                 logger.LogDebug($"Looking for page {page} ");
                 stocks = stocks.Skip(size * page);
             }
             if (size != 0)
             {
                 logger.LogDebug($"Getting {size} stocks");
+                lastPage = stocks.Count() / size + (stocks.Count() % size == 0 ? -1 : 0);
                 stocks = stocks.Take(size);
             }
             logger.LogDebug($"Returning {stocks.Count()} stocks");
-            return StatusCode(200, await stocks.Select(stock => $"{stock.Name}: free place = {stock.FreePlace}").ToListAsync());
+            return new ListForPagination<string>(stocks.Select(stock => $"Id: {stock.Id}{Environment.NewLine}Name: {stock.Name}{Environment.NewLine}Free place: {stock.FreePlace}")
+                .ToList(),size,page,lastPage);
+        }
+
+        [HttpGet("get_stocks")]
+        public async Task<string> GetStocks()
+        {
+            var stocks = dbcontext.Stocks.Where(s => true).ToList();
+            int st_q = stocks.Count();
+            var str = JsonConvert.SerializeObject(stocks);
+            return str;
         }
 
         //[HttpPost("addstock")]
@@ -58,7 +73,7 @@ namespace StockService.Controllers
         //    return BadRequest();
         //}
 
-        [HttpPut("books")]
+        [HttpPut("book_stock")]
         public IActionResult BookStock([FromBody]StockTransferOrderModel item)
         {
             logger.LogDebug($"Getting stock with id = {item.StockId}");
@@ -82,7 +97,7 @@ namespace StockService.Controllers
             return Ok();
         }
 
-        [HttpPut("refuses")]
+        [HttpPut("refuse_stock")]
         public IActionResult RefuseStock([FromBody]StockTransferOrderModel item)
         {
             logger.LogDebug($"Getting stock with id = {item.StockId}");

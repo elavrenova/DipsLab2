@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Remotion.Linq.Parsing.ExpressionVisitors.Transformation;
 using DipsLab2.Queue;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DipsLab2.Controllers
 {
@@ -32,7 +33,13 @@ namespace DipsLab2.Controllers
             this.logger = logger;
         }
 
-
+        [HttpGet("order")]
+        public async Task<IActionResult> AddOrder()
+        {
+            var stockList = await stockService.GetStocks(0, 0);
+            ViewBag.stockList = new SelectList(stockList, "Id", "Name");
+            return Ok();
+        }
 
         [HttpPost("order")]
         public async Task<IActionResult> AddOrder(int? stockId, double? value)

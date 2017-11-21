@@ -1,215 +1,165 @@
-﻿using System;
+﻿using Gateway.Models;
+using Gateway.Pagination;
+using Gateway.Queue;
+using Gateway.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Gateway.Models;
-using Gateway.Queue;
-using Gateway.Services;
-using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace Gateway.Controllers
 {
-    //[Route("")]
+    [Route("")]
     public class HomeController : Controller
     {
-        private IOrderService orderService;
+        private AggregationController aggregationController;
         private IStockService stockService;
         private ITransferService transferService;
-        private ILogger<HomeController> logger;
 
-        public HomeController(
-            IOrderService orderService,
-            IStockService stockService,
-            ITransferService transferService,
-            ILogger<HomeController> logger)
+        public HomeController(AggregationController aggregationController, IStockService stockService,
+            ITransferService transferService)
         {
-            this.orderService = orderService;
+            this.aggregationController = aggregationController;
             this.stockService = stockService;
             this.transferService = transferService;
-            this.logger = logger;
+        }
+
+        [HttpGet("order")]
+        public async Task<IActionResult> AddOrder()
+        {
+            var stockList = await stockService.GetStocks();
+            ViewBag.stockList = new SelectList(stockList, "Id", "Name");
+            return View();
         }
 
         [HttpPost("order")]
-        public async Task<IActionResult> AddOrder(int? stockId, double? value)
+        public async Task<IActionResult> AddOrder(StockTransferOrderModel item)
         {
-            if (stockId == null || value == null)
+            if (ModelState.IsValid)
             {
-                return StatusCode(500, "Parameters are invalid");
+                var resp = await aggregationController.AddNewOrder(item);
+                if (resp.StatusCode == 200)
+                {
+                    return RedirectToAction("CorrectlyAddedOrder");
+                }
+                return View("MyError", new ErrorModel(resp));
             }
-            var item = new StockTransferOrderModel();
-            item.StockId = stockId.GetValueOrDefault();
-            item.Value = value.GetValueOrDefault();
-
-            var stockResp = await stockService.BookStock(item);
-            if (stockResp == null)
-            {
-                return StatusCode(503, "StockService is unavailable");
-            }
-            if (stockResp?.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                item.OrderStatus = 20;
-                return StatusCode(500, "Stock wasn't found");
-            }
-            if (stockResp?.StatusCode == System.Net.HttpStatusCode.BadRequest)
-            {
-                item.OrderStatus = 30;
-                return StatusCode(507, "There isn't enough place");
-            }
-            item.OrderStatus = 10;
-            var transfResp = await transferService.FindTransfer(item);
-            if (transfResp?.StatusCode == System.Net.HttpStatusCode.Forbidden)
-            {
-                stockResp = await stockService.RefuseStock(item);
-                return StatusCode(503, "TransferService is unavailable, so recall of refusing stock was made");
-            }
-            if (transfResp?.StatusCode == System.Net.HttpStatusCode.NoContent)
-            {
-                item.OrderStatus = item.OrderStatus + 2;
-                stockResp = await stockService.RefuseStock(item);
-                return StatusCode(500, "There are no transfers");
-            }
-            if (transfResp?.StatusCode == System.Net.HttpStatusCode.BadRequest)
-            {
-                item.OrderStatus += 3;
-                stockResp = await stockService.RefuseStock(item);
-                return StatusCode(500, "All transfers are busy");
-            }
-            item.OrderStatus += 1;
-            var code = await orderService.AddOrder(item);
-            return Ok();
+            var stockList = await stockService.GetStocks();
+            ViewBag.stockList = new SelectList(stockList, "Id", "Name", item.StockId);
+            return View();
         }
 
-        [HttpPut("refuse")]
-        public async Task<IActionResult> RefuseOrder(int? stockId, double? value, int? transferId)
+        [HttpGet("refuse")]
+        public async Task<IActionResult> RefuseOrder()
         {
-            if (stockId == null || value == null || transferId == null)
-            {
-                return StatusCode(500, "Parameters are invalid");
-            }
-            var item = new StockTransferOrderModel();
-            item.StockId = stockId.GetValueOrDefault();
-            item.Value = value.GetValueOrDefault();
-            item.TransferId = transferId.GetValueOrDefault();
+            var stockList = await stockService.GetStocks();
+            ViewBag.stockList = new SelectList(stockList, "Id", "Name");
+            var transfList = await transferService.GetTransfers();
+            ViewBag.transfList = new SelectList(transfList, "Id", "Name");
+            return View();
+        }
 
-            var stockResp = await stockService.RefuseStock(item);
-            var transfResp = await transferService.RefuseTransfer(item);
-            if (stockResp?.StatusCode == System.Net.HttpStatusCode.Forbidden || transfResp?.StatusCode == System.Net.HttpStatusCode.Forbidden)
+        [HttpPost("refuse")]
+        public async Task<IActionResult> RefuseOrder(StockTransferOrderModel item)
+        {
+            if (ModelState.IsValid)
             {
-                if (stockResp?.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                    await transferService.BookTransfer(item);
-                if (transfResp?.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                    await stockService.BookStock(item);
-                QueueProducer.GetIntoQueueTillSuccess(async () =>
+                var resp = await aggregationController.RefuseOrder(item);
+                if (resp.StatusCode == 200)
                 {
-                    using (var client = new HttpClient())
-                    {
-                        try
-                        {
-                            stockResp = await stockService.RefuseStock(item);
-                            transfResp = await transferService.RefuseTransfer(item);
-                            if (stockResp?.StatusCode == System.Net.HttpStatusCode.Forbidden || transfResp?.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                            {
-                                if (stockResp?.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                                    await transferService.BookTransfer(item);
-                                if (transfResp?.StatusCode == System.Net.HttpStatusCode.Forbidden)
-                                    await stockService.BookStock(item);
-                                return false;
-                            }
-                            return true;
-                        }
-                        catch
-                        {
-                        }
-                        return false;
-                    }
-                });
-                return StatusCode(503, $"StockService: {(stockResp?.StatusCode != System.Net.HttpStatusCode.Forbidden ? "online" : "offline")}; " +
-                                       $"TransferService: {(transfResp?.StatusCode != System.Net.HttpStatusCode.Forbidden ? "online" : "offline")}");
+                    return RedirectToAction("CorrectlyRefusedOrder");
+                }
+                return View("MyError", new ErrorModel(resp));
+            }
+            var stockList = await stockService.GetStocks();
+            ViewBag.stockList = new SelectList(stockList, "Id", "Name", item.StockId);
+            var transfList = await transferService.GetTransfers();
+            ViewBag.transfList = new SelectList(transfList, "Id", "Name");
+            return View();
 
-            }
-            if (stockResp?.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                item.OrderStatus = 20;
-                return BadRequest("Stock wasn't found");
-            }
-            item.OrderStatus = 90;
-
-            if (transfResp?.StatusCode == System.Net.HttpStatusCode.NoContent)
-            {
-                item.OrderStatus = item.OrderStatus + 2;
-                return BadRequest("No info for refusing transfer");
-            }
-            if (transfResp?.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                item.OrderStatus += 3;
-                return BadRequest("Can't find transfer for refuse");
-            }
-            item.OrderStatus += 9;
-            //await orderService.RefuseOrder(item);
-            return Ok();
         }
 
         [HttpGet("info")]
-        public async Task<IActionResult> GetInfo(int? page, int? size)
+        public async Task<IActionResult> GetInfo()
         {
+            var msg = String.Empty;
+            var stockList = await stockService.GetStocks();
+            var transfList = await transferService.GetTransfers();
 
-            if (page == null || size == null)
+            if (transfList == null)
             {
-                var msg = "";
-                if (page == null)
-                {
-                    if (size == null)
-                        msg = "Parameters page and size are invalid";
-                    else
-                    {
-                        msg = "Page parameter is not valid";
-                    }
-                }
-                else
-                {
-                    msg = "Size parameter is invalid";
-                }
-
-                return RedirectToAction("Error400", new { msg });
-            }
-            var message = string.Empty;
-            List<string> stockList = await stockService.GetAllStocks(page.GetValueOrDefault(), size.GetValueOrDefault());
-            List<string> transferList = await transferService.GetAllTransfers(page.GetValueOrDefault(), size.GetValueOrDefault());
-            if (transferList == null)
-            {
-                logger.LogCritical("TransferService is unavailable");
-                message = "TranserService is unavailable";
+                msg = "TranserService is unavailable";
                 if (stockList == null)
                 {
-                    logger.LogCritical("Transfer & Stock Services are unavailable both");
-                    message += " and StockService is also unavailable";
-                    return StatusCode(500, message);
+                    msg += " and StockService is also unavailable";
+                    var resp = StatusCode(503, msg);
+                    return View("MyError", new ErrorModel(resp));
                 }
-                return StatusCode(200, stockList);
+                ViewBag.stockList = stockList.ToList();
+                return View("InfoDegradation");
             }
-            stockList.Add("");
-            stockList.AddRange(transferList);
-
-            return View(stockList);
+            ViewBag.stockList = stockList.ToList();
+            ViewBag.transferList = transfList.ToList();
+            return View();
         }
 
+        [HttpGet("stocks")]
+        public async Task<IActionResult> GetStocks()
+        {
+            var msg = String.Empty;
+            var stockList = await stockService.GetStocks();
+            if (stockList == null)
+            {
+                msg += "StockService is unavailable";
+                var resp = StatusCode(503, msg);
+                return View("MyError", new ErrorModel(resp));
+            }
+            ViewBag.stockList = stockList.ToList();
+            return View("InfoDegradation");
+        }
+
+        [HttpGet("transfers")]
+        public async Task<IActionResult> GetTransfers()
+        {
+            var msg = String.Empty;
+            var transfList = await transferService.GetTransfers();
+            if (transfList == null)
+            {
+                msg += "TransferService is unavailable";
+                var resp = StatusCode(503, msg);
+                return View("MyError", new ErrorModel(resp));
+            }
+            ViewBag.transfList = transfList.ToList();
+            return View("Transfers");
+        }
+
+        [HttpGet("")]
         public IActionResult Index()
         {
             return View();
         }
 
-
+        [HttpGet("error")]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        public IActionResult Error400(string msg)
+        [HttpGet("success_adding_order")]
+        public IActionResult CorrectlyAddedOrder()
         {
-            ViewBag.msg = msg;
+            return View();
+        }
+
+        [HttpGet("success_refusing_order")]
+        public IActionResult CorrectlyRefusedOrder()
+        {
             return View();
         }
     }
