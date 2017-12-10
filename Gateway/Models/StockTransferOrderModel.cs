@@ -8,10 +8,10 @@ namespace Gateway.Models
 {
     public class StockTransferOrderModel
     {
-        public int OrderId { get; set; }
+        public int Id { get; set; }
         [Display(Name="Choose stock name")]
         public int StockId { get; set; }
-        public int OrderStatus { get; set; }
+        public int Status { get; set; }
         [Display(Name = "Choose transfer name")]
         public int TransferId { get; set; }
         [Range(0,1000000)]

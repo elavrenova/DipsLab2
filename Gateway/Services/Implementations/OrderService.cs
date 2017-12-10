@@ -30,6 +30,35 @@ namespace Gateway.Services.Implementations
 
         }
 
+        public async Task<List<StockTransferOrderModel>> GetOrders()
+        {
+            var res = await Get($"get_orders");
+            string response = await res.Content.ReadAsStringAsync();
+            try
+            {
+                return JsonConvert.DeserializeObject<List<StockTransferOrderModel>>(response).ToList();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public async Task<StockTransferOrderModel> GetById(int id)
+        {
+            var res = Get($"getorder/{id}").Result;
+            string response = res.Content.ReadAsStringAsync().Result;
+            try
+            {
+                return JsonConvert.DeserializeObject<StockTransferOrderModel>(response);
+            }
+            catch
+            {
+                return null;
+            }
+
+        }
+
         public async Task<HttpResponseMessage> AddOrder(StockTransferOrderModel item)
         {
             return await PostJson("", item);

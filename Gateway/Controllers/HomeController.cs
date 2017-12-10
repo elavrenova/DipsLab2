@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Gateway.Authorisation;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace Gateway.Controllers
@@ -21,19 +22,27 @@ namespace Gateway.Controllers
         private AggregationController aggregationController;
         private IStockService stockService;
         private ITransferService transferService;
+        private IOrderService orderService;
+
 
         public HomeController(AggregationController aggregationController, IStockService stockService,
-            ITransferService transferService)
+            ITransferService transferService, IOrderService orderService)
         {
             this.aggregationController = aggregationController;
             this.stockService = stockService;
             this.transferService = transferService;
+            this.orderService = orderService;
         }
 
         [HttpGet("order")]
         public async Task<IActionResult> AddOrder()
         {
             var stockList = await stockService.GetStocks();
+            if (stockList == null)
+            {
+                var resp = StatusCode(500, "StockService is unavailable. Please, try again later");
+                return View("MyError", new ErrorModel(resp));
+            }
             ViewBag.stockList = new SelectList(stockList, "Id", "Name");
             return View();
         }
@@ -51,6 +60,11 @@ namespace Gateway.Controllers
                 return View("MyError", new ErrorModel(resp));
             }
             var stockList = await stockService.GetStocks();
+            if (stockList == null)
+            {
+                var resp = StatusCode(500, "StockService is unavailable. Please, try again later");
+                return View("MyError", new ErrorModel(resp));
+            }
             ViewBag.stockList = new SelectList(stockList, "Id", "Name", item.StockId);
             return View();
         }
@@ -60,7 +74,17 @@ namespace Gateway.Controllers
         {
             var stockList = await stockService.GetStocks();
             ViewBag.stockList = new SelectList(stockList, "Id", "Name");
+            if (stockList == null)
+            {
+                var resp = StatusCode(500, "StockService is unavailable. Please, try later");
+                return View("MyError", new ErrorModel(resp));
+            }
             var transfList = await transferService.GetTransfers();
+            if (transfList == null)
+            {
+                var resp = StatusCode(500, "TransferService is unavailable. Please, try again later");
+                return View("MyError", new ErrorModel(resp));
+            }
             ViewBag.transfList = new SelectList(transfList, "Id", "Name");
             return View();
         }
@@ -78,11 +102,56 @@ namespace Gateway.Controllers
                 return View("MyError", new ErrorModel(resp));
             }
             var stockList = await stockService.GetStocks();
+            if(stockList == null)
+            {
+                var resp = StatusCode(500, "Your data wasn't correct. And StockService is unavailable now. Please, try later");
+                return View("MyError", new ErrorModel(resp));
+            }
             ViewBag.stockList = new SelectList(stockList, "Id", "Name", item.StockId);
             var transfList = await transferService.GetTransfers();
+            if (transfList == null)
+            {
+                var resp = StatusCode(500, "Your data wasn't correct. And TransferService is unavailable. Please, try again later");
+                return View("MyError", new ErrorModel(resp));
+            }
             ViewBag.transfList = new SelectList(transfList, "Id", "Name");
             return View();
+        }
 
+        [HttpGet("refuse_by_order_id")]
+        public async Task<IActionResult> RefuseOrderByOrderId()
+        {
+            var ordList = await orderService.GetOrders();
+            if (ordList == null)
+            {
+                var resp = StatusCode(500, "OrderService is unavailable. Please, try again later");
+                return View("MyError", new ErrorModel(resp));
+            }
+            ViewBag.ordList = new SelectList(ordList, "Id", "Id");
+            return View();
+        }
+
+        [HttpPost("refuse_by_order_id")]
+        public async Task<IActionResult> RefuseOrderByOrderId(StockTransferOrderModel item)
+        {
+            if (ModelState.IsValid)
+            {
+                var itm = await orderService.GetById(item.Id);
+                var resp = await aggregationController.RefuseOrder(itm);
+                if (resp.StatusCode == 200)
+                {
+                    return RedirectToAction("CorrectlyRefusedOrder");
+                }
+                return View("MyError", new ErrorModel(resp));
+            }
+            var ordList = await orderService.GetOrders();
+            if (ordList == null)
+            {
+                var resp = StatusCode(500, "OrderService is unavailable. Please, try again later");
+                return View("MyError", new ErrorModel(resp));
+            }
+            ViewBag.ordList = new SelectList(ordList, "Id", "Id");
+            return View();
         }
 
         [HttpGet("info")]
@@ -91,7 +160,6 @@ namespace Gateway.Controllers
             var msg = String.Empty;
             var stockList = await stockService.GetStocks();
             var transfList = await transferService.GetTransfers();
-
             if (transfList == null)
             {
                 msg = "TranserService is unavailable";
@@ -127,6 +195,7 @@ namespace Gateway.Controllers
         [HttpGet("transfers")]
         public async Task<IActionResult> GetTransfers()
         {
+
             var msg = String.Empty;
             var transfList = await transferService.GetTransfers();
             if (transfList == null)
@@ -136,7 +205,37 @@ namespace Gateway.Controllers
                 return View("MyError", new ErrorModel(resp));
             }
             ViewBag.transfList = transfList.ToList();
-            return View("Transfers");
+            return View("Transfers");   
+        }
+
+        [HttpGet("orders")]
+        public async Task<IActionResult> GetOrders()
+        {
+            var msg = String.Empty;
+            var stockList = await stockService.GetStocks();
+            if (stockList == null)
+            {
+                var resp = StatusCode(500, "StockService is unavailable");
+                return View("MyError", new ErrorModel(resp));
+            }
+               
+            var transfList = await transferService.GetTransfers();
+            if (transfList == null)
+            {
+                var resp = StatusCode(500, "StockService is unavailable");
+                return View("MyError", new ErrorModel(resp));
+            }
+            var orderList = await orderService.GetOrders();
+            if (orderList == null)
+            {
+                msg += "OrderService is unavailable";
+                var resp = StatusCode(503, msg);
+                return View("MyError", new ErrorModel(resp));
+            }
+            ViewBag.stockList = stockList.ToList();
+            ViewBag.transfList = transfList.ToList();
+            ViewBag.orderList = orderList.ToList();
+            return View("Orders");
         }
 
         [HttpGet("")]
@@ -162,5 +261,6 @@ namespace Gateway.Controllers
         {
             return View();
         }
+
     }
 }

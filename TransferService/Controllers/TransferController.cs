@@ -25,29 +25,33 @@ namespace TransferService.Controllers
             this.logger = logger;
         }
 
-        [HttpGet("get_all_transfers")]
-        public async Task<ListForPagination<string>> GetAllTransfers(int size, int page)
-        {
-            int lastPage = 0;
-            var transfers = dbcontext.Transfers.Where(s=> true);
-            if (size != 0 && page != 0)
-            {
-                transfers = transfers.Skip(size * page);
-            }
-            if (size != 0)
-            {
-                lastPage = transfers.Count() / size + (transfers.Count() % size == 0 ? -1 : 0);
-                transfers = transfers.Take(size);
-            }
-            
-            var str = JsonConvert.SerializeObject(transfers);
-            return new ListForPagination<string>(str,size,page,lastPage);
-        }
+        //[HttpGet("get_all_transfers")]
+        //public async Task<ListForPagination<string>> GetAllTransfers(int size, int page)
+        //{
+        //    int lastPage = 0;
+        //    var transfers = dbcontext.Transfers.Where(s=> true);
+        //    if (size != 0 && page != 0)
+        //    {
+        //        transfers = transfers.Skip(size * page);
+        //    }
+        //    if (size != 0)
+        //    {
+        //        lastPage = transfers.Count() / size + (transfers.Count() % size == 0 ? -1 : 0);
+        //        transfers = transfers.Take(size);
+        //    }
+
+        //    var str = JsonConvert.SerializeObject(transfers);
+        //    return new ListForPagination<string>(str,size,page,lastPage);
+        //}
 
         [HttpGet("get_transfers")]
         public async Task<string> GetTransfers()
         {
             var transfers = dbcontext.Transfers.Where(s => true).ToList();
+            if (transfers.Count == 0)
+            {
+                return "ololo";
+            }
             var str = JsonConvert.SerializeObject(transfers);
             return str;
         }
@@ -98,7 +102,8 @@ namespace TransferService.Controllers
             item.TransferId = TransId;
             dbcontext.Transfers.Update(transfer);
             dbcontext.SaveChanges();
-            return Ok();
+            var msg = TransId.ToString();
+            return StatusCode(200, msg);
         }
 
         [HttpPut("book_transfer")]

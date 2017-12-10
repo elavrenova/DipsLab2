@@ -7,7 +7,7 @@ namespace OrderService.Models
         public Order(StockTransferOrderModel orderModel)
         {
             this.UserId = orderModel.UserId;
-            this.Status = orderModel.OrderStatus;
+            this.Status = orderModel.Status;
             this.StockId = orderModel.StockId;
             this.TransferId = orderModel.TransferId;
             this.Value = orderModel.Value;

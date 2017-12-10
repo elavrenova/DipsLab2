@@ -1,0 +1,32 @@
+﻿@model StockTransferOrderModel
+
+@{
+    ViewBag.Title = "Refusing order by id";
+    Layout = "_Layout";
+}
+<div class="form-horizontal">
+    <form asp-controller="Home" asp-action="RefuseOrderByOrderId" method="post">
+        <div class="form-group">
+            <label asp-for="StockId" class="col-md-2 control-label"></label>
+            <select asp-for="StockId" asp-items="@ViewBag.stockList" class="form-control"></select>
+        </div>
+        <div class="form-group">
+            <label asp-for="TransferId" class="col-md-2 control-label"></label>
+            <select asp-for="TransferId" asp-items="@ViewBag.transfList" class="form-control"></select>
+        </div>
+        <div class="form-group">
+            <label asp-for="Value" class="control-label col-md-2"></label>
+            <input asp-for="Value" class="form-control" />
+            <span asp-validation-for="Value" class="text-danger"></span>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-success">Save</button>
+            </div>
+            <div class="col-md-2">
+                <a asp-action="Index" class="btn btn-danger">Reject</a>
+            </div>
+            <div class="col-md-8"></div>
+        </div>
+    </form>
+</div>

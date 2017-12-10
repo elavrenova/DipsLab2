@@ -1,0 +1,68 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Gateway.Services;
+using Microsoft.AspNetCore.Http;
+
+namespace Gateway.Authorisation
+{
+    public class ServiceAuthorizationMiddleWare : AuthorizationMiddleWare
+    {
+        private const string serviceWord = "Service";
+        private List<(string, string)> allowedApps = new List<(string, string)> { ("AppId", "AppSecret") };
+
+        public ServiceAuthorizationMiddleWare(RequestDelegate next, IAuthService authService) : base(next, authService)
+        {
+        }
+
+        public override async Task Invoke(HttpContext context)
+        {
+            if (RequestedToken(context))
+            {
+                context.Response.StatusCode = 200;
+                //await context.Response.WriteAsync(tokensStore.GetToken(Guid.NewGuid().ToString(), serviceWord, TimeSpan.FromMinutes(5)));
+                return;
+            }
+            else if (context.Request.Headers.Keys.Contains(AuthorizationWord))
+            {
+                var auth = context.Request.Headers[AuthorizationWord];
+                await CheckAuthorization(context, auth);
+            }
+            else
+                await base.Invoke(context);
+        }
+
+        public override List<string> GetAnonymousPaths()
+        {
+            return new[] { "login" }.ToList();
+        }
+
+        public override async Task ReturnForbidden(HttpContext context, string message)
+        {
+            using (var writer = new StreamWriter(context.Response.Body))
+            {
+                context.Response.StatusCode = 401;
+                await writer.WriteAsync(message);
+            }
+        }
+
+        private bool RequestedToken(HttpContext context)
+        {
+            if (context.Request.Headers.Keys.Contains(AuthorizationWord))
+            {
+                var match = Regex.Match(string.Join(string.Empty, context.Request.Headers[AuthorizationWord]), @"Basic (\S+)");
+                if (match.Groups.Count > 1)
+                {
+                    var appIdAndSecret = Encoding.UTF8.GetString(Convert.FromBase64String(match.Groups[1].Value)).Split(':');
+                    if (allowedApps.Contains((appIdAndSecret[0], appIdAndSecret[1])))
+                        return true;
+                }
+            }
+            return false;
+        }
+    }
+}

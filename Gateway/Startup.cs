@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Gateway.Authorisation;
 using Gateway.Controllers;
 using Gateway.Services;
 using Gateway.Services.Implementations;
@@ -29,6 +30,7 @@ namespace Gateway
             services.AddTransient<IOrderService, OrderService>();
             services.AddTransient<IStockService, StockService>();
             services.AddTransient<ITransferService, TransferService>();
+            services.AddTransient<IAuthService, AuthService>();
             services.AddTransient<AggregationController>();
         }
 
@@ -44,7 +46,9 @@ namespace Gateway
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-
+            app.UseCors("AllowAll");
+            app.UseMiddleware<GatewayAuthorizationMiddleWare>();
+            app.UseAuthentication();
             app.UseStaticFiles();
 
             app.UseMvc(routes =>
