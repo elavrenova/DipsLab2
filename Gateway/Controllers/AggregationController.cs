@@ -32,7 +32,6 @@ namespace Gateway.Controllers
             this.logger = logger;
         }
 
-        [Authorize]
         public async Task<ObjectResult> AddNewOrder(StockTransferOrderModel item)
         {
             var msg = "";

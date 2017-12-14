@@ -6,10 +6,12 @@ using Gateway.Authorisation;
 using Gateway.Controllers;
 using Gateway.Services;
 using Gateway.Services.Implementations;
+using IdentityServer4.AccessTokenValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Gateway
 {
@@ -32,6 +34,24 @@ namespace Gateway
             services.AddTransient<ITransferService, TransferService>();
             services.AddTransient<IAuthService, AuthService>();
             services.AddTransient<AggregationController>();
+            services.AddLogging(lb => lb.AddConsole());
+            services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
+                .AddIdentityServerAuthentication(o =>
+                {
+                    o.Authority = "http://localhost:50539";
+                    o.RequireHttpsMetadata = false;
+                    o.ApiName = "api";
+                });
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    builder => builder
+                        .AllowAnyMethod()
+                        .AllowAnyOrigin()
+                        .AllowAnyHeader());
+            });
+            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

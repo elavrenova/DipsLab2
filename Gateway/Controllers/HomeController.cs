@@ -12,6 +12,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Gateway.Authorisation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace Gateway.Controllers
@@ -190,6 +191,14 @@ namespace Gateway.Controllers
             }
             ViewBag.stockList = stockList.ToList();
             return View("InfoDegradation");
+        }
+
+        [Authorize]
+        [HttpGet("getoaoth2")]
+        public async Task<string> GetStocksOAuth()
+        {
+            string test = "Correct oaoth2 test";
+            return test;
         }
 
         [HttpGet("transfers")]

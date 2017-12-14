@@ -33,13 +33,13 @@ namespace AuthServer
             {
                 new Client
                 {
-                    ClientId = "test-client",
+                    ClientId = "clientId",
                     ClientName = "Test client",
                     AllowedGrantTypes = GrantTypes.Code.Concat(GrantTypes.ResourceOwnerPassword).ToList(),
                     AllowAccessTokensViaBrowser = true,
                     AllowOfflineAccess = true,
                     RequireConsent = false,
-                    RedirectUris = { "https://gateway.loc/api" },
+                    RedirectUris = { "http://localhost:60992" },
                     EnableLocalLogin = true,
                     AccessTokenLifetime = Expiration,
                     IdentityTokenLifetime = Expiration,
@@ -49,7 +49,7 @@ namespace AuthServer
                         IdentityServerConstants.StandardScopes.OfflineAccess,
                         "api"
                     },
-                    ClientSecrets = new List<Secret>() { new Secret("test-secret".Sha256()) }
+                    ClientSecrets = new List<Secret>() { new Secret("Secret".Sha256()) }
                 }
             };
 

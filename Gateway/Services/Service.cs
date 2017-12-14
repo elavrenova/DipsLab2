@@ -85,7 +85,7 @@ namespace Gateway.Services
             try
             {
                 client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-                var result = await client.GetAsync(GetAddress(string.Empty));
+                var result = await client.GetAsync(GetAddress("/"));
                 if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                     token = await GetToken(appId, appSecret);
                 client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);

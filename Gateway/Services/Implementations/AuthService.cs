@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Gateway.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 
 namespace Gateway.Services.Implementations
@@ -11,14 +12,13 @@ namespace Gateway.Services.Implementations
     public class AuthService: Service, IAuthService
     {
         public AuthService(IConfiguration configuration) : 
-            base("http://localhost:50539/") { }
+            base("http://localhost:50539") { }
 
-        public async Task<string> Login(UserModel item)
+        public async Task<HttpResponseMessage> Login(UserModel item)
         {
-            var res = await PostJson("auth/customlogin", item);
             try
             {
-                return await res.Content.ReadAsStringAsync();
+                return await PostJson("account/customlogin", item);
             }
             catch
             {
@@ -27,12 +27,12 @@ namespace Gateway.Services.Implementations
         }
         public async Task<HttpResponseMessage> LogOut(string token)
         {
-            return await Get($"auth/customlogout?token={token}");
+            return await Get($"account/customlogout?token={token}");
         }
 
         public async Task<string> VerifyToken(string token)
         {
-            var resp = await Get($"auth/verifytoken?token={token}");
+            var resp = await Get($"account/verifytoken?token={token}");
             try
             {
                 return await resp.Content.ReadAsStringAsync();

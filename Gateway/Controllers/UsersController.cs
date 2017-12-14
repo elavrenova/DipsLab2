@@ -29,16 +29,25 @@ namespace Gateway.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(AuthenticationModel authenticationModel)
         {
-            var token = await authService.Login(new Models.UserModel { Username = authenticationModel.Username, Password = authenticationModel.Password });
-            if (String.IsNullOrWhiteSpace(token))
+            var response = await authService.Login(new Models.UserModel { Username = authenticationModel.Username, Password = authenticationModel.Password });
+            if (response.IsSuccessStatusCode)
             {
-                var resp = StatusCode(500, "Authentication failed");
+                var token = await response.Content.ReadAsStringAsync();
+                if (String.IsNullOrWhiteSpace(token))
+                {
+                    var resp = StatusCode(500, "Authentication failed");
+                    return View("MyError", new ErrorModel(resp));
+                }
+                Response.Cookies.Append(AuthorizationMiddleWare.AuthorizationWord, $"Bearer {token}");
+                if (authenticationModel.Redirect != null)
+                    return Redirect(authenticationModel.Redirect);
+                return Redirect("/");
+            }
+            else
+            {
+                var resp = StatusCode(500, "Wrong password! Try again");
                 return View("MyError", new ErrorModel(resp));
-            }    
-            Response.Cookies.Append(AuthorizationMiddleWare.AuthorizationWord, $"Bearer {token}");
-            if (authenticationModel.Redirect != null)
-                return Redirect(authenticationModel.Redirect);
-            return RedirectToAction("Index",nameof(HomeController),null);
+            }
         }
 
         [HttpGet("logout")]
@@ -49,7 +58,7 @@ namespace Gateway.Controllers
                 var cookie = Request.Cookies[AuthorizationMiddleWare.AuthorizationWord];
                 Response.Cookies.Append(AuthorizationMiddleWare.AuthorizationWord, cookie, new Microsoft.AspNetCore.Http.CookieOptions { Expires = DateTime.Now.AddDays(-1) });
             }
-            return RedirectToAction("Index", nameof(HomeController),null);
+            return RedirectToAction(nameof(Authenticate));
         }
     }
 }

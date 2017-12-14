@@ -62,7 +62,6 @@ namespace AuthServer
                 app.UseDeveloperExceptionPage();
             }
             app.UseCors("AllowAll");
-
             app.UseIdentityServer();
             app.UseMvc();
         }
