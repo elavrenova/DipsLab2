@@ -16,12 +16,10 @@ namespace Gateway.Authorisation
         public static string RoleWord = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
         protected readonly RequestDelegate _next;
         //protected readonly TokensStore tokensStore;
-        protected readonly IAuthService authService;
 
-        public AuthorizationMiddleWare(RequestDelegate next, IAuthService authService)
+        public AuthorizationMiddleWare(RequestDelegate next)
         {
             _next = next;
-            this.authService = authService;
         }
 
         public virtual async Task Invoke(HttpContext context)
@@ -29,7 +27,7 @@ namespace Gateway.Authorisation
             if (context.Request.Cookies.Keys.Contains(AuthorizationWord))
             {
                 var auth = context.Request.Cookies[AuthorizationWord];
-                await CheckAuthorization(context, auth);
+                await CheckBearerAuthorization(context, auth);
             }
             else if (context.Request.Path.Value.Split('/').Intersect(GetAnonymousPaths()).Any())
             {
@@ -43,7 +41,7 @@ namespace Gateway.Authorisation
         }
 
 
-        protected async Task CheckAuthorization(HttpContext context, string auth)
+        protected async Task CheckBearerAuthorization(HttpContext context, string auth)
         {
             var match = Regex.Match(auth, @"Bearer (\S+)");
             if (match.Groups.Count == 1)
@@ -53,8 +51,7 @@ namespace Gateway.Authorisation
             else
             {
                 var token = match.Groups[1].Value;
-                //var result = tokensStore.CheckToken(token);
-                var result = await authService.VerifyToken(token);
+                var result = GetUserByToken(token);
                 if (!string.IsNullOrWhiteSpace(result))
                 {
                     context.Request.Headers.Add(UserWord, result);
@@ -70,5 +67,7 @@ namespace Gateway.Authorisation
         public abstract Task ReturnForbidden(HttpContext context, string message);
 
         public abstract List<string> GetAnonymousPaths();
+
+        public abstract string GetUserByToken(string token);
     }
 }

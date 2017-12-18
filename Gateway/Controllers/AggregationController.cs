@@ -32,6 +32,8 @@ namespace Gateway.Controllers
             this.logger = logger;
         }
 
+        [Authorize]
+        [HttpPost("add_new_order")]
         public async Task<ObjectResult> AddNewOrder(StockTransferOrderModel item)
         {
             var msg = "";
@@ -79,6 +81,8 @@ namespace Gateway.Controllers
             return StatusCode(200,msg);
         }
 
+        [Authorize]
+        [HttpPut("refuse_order")]
         public async Task<ObjectResult> RefuseOrder(StockTransferOrderModel item)
         {
             var msg = "";

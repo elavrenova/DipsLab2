@@ -29,10 +29,10 @@ namespace Gateway
         {
             services.AddMvc();
 
-            services.AddTransient<IOrderService, OrderService>();
-            services.AddTransient<IStockService, StockService>();
-            services.AddTransient<ITransferService, TransferService>();
-            services.AddTransient<IAuthService, AuthService>();
+            services.AddSingleton<IOrderService, OrderService>();
+            services.AddSingleton<IStockService, StockService>();
+            services.AddSingleton<ITransferService, TransferService>();
+            services.AddSingleton<IAuthService, AuthService>();
             services.AddTransient<AggregationController>();
             services.AddLogging(lb => lb.AddConsole());
             services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)

@@ -8,12 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.EntityFrameworkCore;
-using StockService.Models;
-using System.Data.SqlClient;
-using Gateway.Authorisation;
 
-namespace StockService
+namespace StatisticServer
 {
     public class Startup
     {
@@ -27,12 +23,7 @@ namespace StockService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<StockContext>(opt =>
-                //opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-                opt.UseInMemoryDatabase("Stocks"));
             services.AddMvc();
-            services.AddSingleton<TokensStore>();
-            //services.BuildServiceProvider().GetRequiredService<StockContext>().Database.Migrate();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,7 +33,7 @@ namespace StockService
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseMiddleware<ServiceAuthorizationMiddleWare>();
+
             app.UseMvc();
         }
     }

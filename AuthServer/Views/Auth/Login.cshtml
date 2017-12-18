@@ -1,0 +1,12 @@
+﻿@{ 
+    Layout = "_Layout";
+}
+@model AuthServer.Models.UserLogin
+<form asp-action="Login">
+    <div class="form-group">
+        <input asp-for="Username" />
+        <input asp-for="Password" />
+        <input asp-for="ReturnUrl" value="@Model.ReturnUrl" hidden />
+        <input type="submit" value="Login"/>
+    </div>
+</form>

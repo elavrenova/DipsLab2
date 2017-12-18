@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderService", "OrderServic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gateway", "Gateway\Gateway.csproj", "{B3370840-545D-49BD-9ADF-48855715BEEA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServer", "AuthServer\AuthServer.csproj", "{B98E25D3-236D-4E09-B2E6-EB820C9F566B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthServer", "AuthServer\AuthServer.csproj", "{B98E25D3-236D-4E09-B2E6-EB820C9F566B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatisticServer", "StatisticServer\StatisticServer.csproj", "{C2D3756B-8C7B-4A54-A036-FE6B0CB45C64}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{B98E25D3-236D-4E09-B2E6-EB820C9F566B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B98E25D3-236D-4E09-B2E6-EB820C9F566B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B98E25D3-236D-4E09-B2E6-EB820C9F566B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2D3756B-8C7B-4A54-A036-FE6B0CB45C64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2D3756B-8C7B-4A54-A036-FE6B0CB45C64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2D3756B-8C7B-4A54-A036-FE6B0CB45C64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2D3756B-8C7B-4A54-A036-FE6B0CB45C64}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

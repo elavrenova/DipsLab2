@@ -204,7 +204,6 @@ namespace Gateway.Controllers
         [HttpGet("transfers")]
         public async Task<IActionResult> GetTransfers()
         {
-
             var msg = String.Empty;
             var transfList = await transferService.GetTransfers();
             if (transfList == null)
@@ -252,6 +251,23 @@ namespace Gateway.Controllers
         {
             return View();
         }
+
+        //[HttpGet("")]
+        //public IActionResult OAuth2Callback(string code, string scope)
+        //{
+        //    using (var client = new HttpClient())
+        //    {
+        //        var tokenReponse = client.PostAsync("http://localhost:50539/connect/token?", new FormUrlEncodedContent(new Dictionary<string, string>
+        //        {
+        //            {"grant_type", "authorization_code" },
+        //            {"code", code },
+        //            {"redirect_uri", "http://localhost:60992" },
+        //            {"client_id", "clientId" },
+        //            {"client_secret", "Secret" }
+        //        }));
+        //    }
+        //        return Ok();
+        //}
 
         [HttpGet("error")]
         public IActionResult Error()

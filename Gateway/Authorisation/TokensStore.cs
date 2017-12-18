@@ -45,7 +45,7 @@ namespace Gateway.Authorisation
             }
         }
 
-        public string GetToken(string owner, string role, TimeSpan expiration)
+        public string GetToken(string owner, TimeSpan expiration)
         {
             lock (lck)
             {
@@ -57,8 +57,7 @@ namespace Gateway.Authorisation
                         Token = token,
                         Expiry = expiry,
                         LastAccessDate = DateTime.Now,
-                        Username = owner,
-                        Role = role
+                        Username = owner
                     }
                 });
                 return token;
@@ -71,16 +70,6 @@ namespace Gateway.Authorisation
             {
                 if (tokens.Any(t => t.Token == token))
                     return tokens.First(t => t.Token == token).Username;
-                return null;
-            }
-        }
-
-        public string GetRoleByToken(string token)
-        {
-            lock (lck)
-            {
-                if (tokens.Any(t => t.Token == token))
-                    return tokens.First(t => t.Token == token).Role;
                 return null;
             }
         }
@@ -98,7 +87,6 @@ namespace Gateway.Authorisation
         public int Id { get; set; }
         public string Token { get; set; }
         public string Username { get; set; }
-        public string Role { get; set; }
         public DateTime Expiry { get; set; }
         public DateTime LastAccessDate { get; set; }
     }

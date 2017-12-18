@@ -15,7 +15,7 @@ namespace Gateway.Services.Implementations
     public class StockService : Service, IStockService
     {
         public StockService(IConfiguration configuration) : 
-            base("http://stockservicedl2.azurewebsites.net") { }
+            base(configuration.GetSection("ServiceUrl")["Stock"]) { }
 
         public async Task<ListForPagination<string>> GetAllStocks(int page, int size)
         {

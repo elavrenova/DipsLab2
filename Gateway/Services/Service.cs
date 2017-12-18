@@ -12,8 +12,8 @@ namespace Gateway.Services
     public class Service
     {
         private string baseAddress;
-        private string appId = "appId";
-        private string appSecret = "appSecret";
+        private string appId = "AppId";
+        private string appSecret = "AppSecret";
         private string token;
 
         public Service(string baseAddress)
@@ -77,18 +77,20 @@ namespace Gateway.Services
 
         private string GetAddress(string addr)
         {
-            return $"{baseAddress}/{addr}";
+            return $"{baseAddress.TrimEnd('/')}/{addr}";
         }
 
         private async Task EstablishConnection(HttpClient client)
         {
             try
             {
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 var result = await client.GetAsync(GetAddress("/"));
                 if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
                     token = await GetToken(appId, appSecret);
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                }
             }
             catch { }
         }
@@ -99,7 +101,7 @@ namespace Gateway.Services
             using (var client = new HttpClient())
                 try
                 {
-                    var str = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{id}:{secret}"));
+                    var str = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{id}:{secret}"));
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", str);
                     result = await client.GetAsync(GetAddress(string.Empty));
                 }

@@ -13,7 +13,7 @@ namespace Gateway.Services.Implementations
     public class OrderService : Service, IOrderService
     {
         public OrderService(IConfiguration configuration) : 
-            base("http://orderservicedl2.azurewebsites.net/") { }
+            base(configuration.GetSection("ServiceUrl")["Order"]) { }
 
         public List<string> GetAllOrders(int page, int size)
         {

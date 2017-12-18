@@ -29,7 +29,8 @@ namespace AuthServer.Controllers
         [HttpGet("login")]
         public async Task<IActionResult> Login(string returnUrl)
         {
-            return await Login(new UserLogin { Username = "User1", Password = "pass1", ReturnUrl = returnUrl });
+            //return await Login(new UserLogin { Username = "User1", Password = "pass1", ReturnUrl = returnUrl });
+            return View(new UserLogin { ReturnUrl = returnUrl });
         }
 
         [HttpPost]

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace Gateway
+namespace StatisticServer
 {
     public class Program
     {
@@ -19,7 +19,6 @@ namespace Gateway
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-            
                 .UseStartup<Startup>()
                 .Build();
     }

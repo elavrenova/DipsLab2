@@ -10,8 +10,11 @@ namespace Gateway.Authorisation
 {
     public class GatewayAuthorizationMiddleWare : AuthorizationMiddleWare
     {
-        public GatewayAuthorizationMiddleWare(RequestDelegate next, IAuthService authService) : base(next, authService)
+        private IAuthService authService;
+
+        public GatewayAuthorizationMiddleWare(RequestDelegate next, IAuthService authService) : base(next)
         {
+            this.authService = authService;
         }
 
         public override async Task Invoke(HttpContext context)
@@ -39,6 +42,11 @@ namespace Gateway.Authorisation
                 context.Response.Cookies.Append(AuthorizationWord, "-", new CookieOptions{Expires = DateTimeOffset.Now + TimeSpan.FromDays(-1)});
             }
             context.Response.Redirect(redirect);
+        }
+
+        public override string GetUserByToken(string token)
+        {
+            return authService.VerifyToken(token)?.Result;
         }
     }
 }

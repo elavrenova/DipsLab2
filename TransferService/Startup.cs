@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TransferService.Models;
+using Gateway.Authorisation;
 
 namespace TransferService
 {
@@ -25,9 +26,12 @@ namespace TransferService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<TransferContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddSingleton<TokensStore>();
+            services.AddDbContext<TransferContext>(opt =>
+                //opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                opt.UseInMemoryDatabase("Transfers"));
             services.AddMvc();
-            services.BuildServiceProvider().GetRequiredService<TransferContext>().Database.Migrate();
+            //services.BuildServiceProvider().GetRequiredService<TransferContext>().Database.Migrate();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -37,7 +41,7 @@ namespace TransferService
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseMiddleware<ServiceAuthorizationMiddleWare>();
             app.UseMvc();
         }
     }

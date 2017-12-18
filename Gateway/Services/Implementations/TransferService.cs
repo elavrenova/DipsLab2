@@ -12,7 +12,7 @@ namespace Gateway.Services.Implementations
     public class TransferService : Service, ITransferService
     {
         public TransferService(IConfiguration configuration) : 
-            base("http://transferservicedl2.azurewebsites.net") { }
+            base(configuration.GetSection("ServiceUrl")["Transf"]) { }
 
         public async Task<List<string>> GetAllTransfers(int page, int size)
         {
