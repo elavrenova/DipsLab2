@@ -47,7 +47,7 @@
                 <ul class="nav navbar-nav">
                         @if (User.IsInRole("Admin"))
                         {
-                            <li><a asp-controller="Statistics" asp-action="RequestsStatistics">Requests statistics</a></li>
+                            @*<li><a asp-controller="Statistics" asp-action="RequestsStatistics">Requests statistics</a></li>*@
                             <li><a asp-controller="Statistics" asp-action="OperationsStatistics">Operations statistics</a></li>
                             <li><a asp-controller="Statistics" asp-action="AddOrderStatistics">Users statistics</a></li>
                             <li><a asp-controller="Statistics" asp-action="OrderValueStatistics">Values statistics</a></li>

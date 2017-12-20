@@ -39,8 +39,8 @@ namespace Gateway.Controllers
             this.eventBus = eventBus;
         }
 
-        [HttpGet("order")]
-        public async Task<IActionResult> AddOrder()
+        [HttpGet("order/{username}")]
+        public async Task<IActionResult> AddOrder(string username)
         {
             var stockList = await stockService.GetStocks();
             if (stockList == null)
@@ -49,10 +49,10 @@ namespace Gateway.Controllers
                 return View("MyError", new ErrorModel(resp));
             }
             ViewBag.stockList = new SelectList(stockList, "Id", "Name");
-            return View();
+            return View(new StockTransferOrderModel { Username = username });
         }
 
-        [HttpPost("order")]
+        [HttpPost("order/{username}")]
         public async Task<IActionResult> AddOrder(StockTransferOrderModel item)
         {
             if (ModelState.IsValid)
@@ -62,7 +62,7 @@ namespace Gateway.Controllers
                 {
                     eventBus.Publish(new AddOrderEvent
                     {
-                        Author = "User" + item.UserId.ToString(),
+                        Author = item.Username,
                         Stock = "Stock" + item.StockId.ToString(),
                         Value = item.Value.ToString()
                     });
@@ -269,9 +269,11 @@ namespace Gateway.Controllers
         }
 
         [HttpGet("")]
-        public IActionResult Index()
+        public IActionResult Index(UserModel usermodel)
         {
-            return View();
+            if (User.Identities.Any(i => i.IsAuthenticated))
+                usermodel.Username = User.Identities.First(i => i.IsAuthenticated).Name;
+            return View(usermodel);
         }
 
         //[HttpGet("")]

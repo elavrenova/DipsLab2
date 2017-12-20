@@ -17,5 +17,6 @@ namespace Gateway.Models
         [Range(0,1000000)]
         public double Value { get; set; }
         public int UserId { get; set; }
+        public string Username { get; set; }
     }
 }

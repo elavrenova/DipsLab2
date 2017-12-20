@@ -74,15 +74,15 @@ namespace Gateway.Controllers
         }
 
         [HttpGet("orders/ordersvalues/values")]
-        public async Task<List<OrderAdditionModel>> OrderValues()
+        public async Task<List<OrderValueModel>> OrderValues()
         {
-            return await statisticsService.GetOrdersAdditions();
+            return await statisticsService.GetOrderValues();
         }
 
         [HttpGet("orders/ordersvalues/detail")]
-        public async Task<List<OrderAdditionDetailModel>> OrderValuesDetail()
+        public async Task<List<OrderValueDetailModel>> OrderValuesDetail()
         {
-            return await statisticsService.GetOrdersAdditionsDetailed();
+            return await statisticsService.GetOrderValuesDetailed();
         }
 
     }

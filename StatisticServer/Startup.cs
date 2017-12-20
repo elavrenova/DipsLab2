@@ -40,6 +40,9 @@ namespace StatisticServer
             services.AddSingleton<IEventsHandler, GetInfoEventHandler>();
             services.AddSingleton<IEventsHandler, GetStocksEventHandler>();
             services.AddSingleton<IEventsHandler, GetTransfersEventHandler>();
+            services.AddSingleton<IEventsHandler, AddedOrderEventHandler>();
+            services.AddSingleton<IEventsHandler, DeletedOrderEventHandler>();
+            services.AddSingleton<IEventsHandler, OrderValuesEventHandler>();
             services.AddTransient<DBProxy>();
         }
 

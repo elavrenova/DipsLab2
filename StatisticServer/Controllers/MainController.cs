@@ -85,5 +85,26 @@ namespace StatisticServer.Controllers
                 Time = i.AddedTime.ToString(@"ddMM-HH:mm")
             }).ToList();
         }
+
+        [HttpGet("ordervalues")]
+        public async Task<List<OrderValueModel>> GetOrderValues()
+        {
+            return dbContext.OrderValues
+                .Select(nai => nai.Value)
+                .GroupBy(s => s)
+                .Select(g => new OrderValueModel { Value = g.Key, Count = g.Count() })
+                .ToList();
+        }
+
+        [HttpGet("ordervalues/detail")]
+        public async Task<List<OrderValueDetailModel>> GetOrderValuesDetailed()
+        {
+            return dbContext.OrderValues.Select(i => new OrderValueDetailModel
+            {
+                Author = i.Author,
+                Value = i.Value,
+                Time = i.AddedTime.ToString(@"ddMM-HH:mm")
+            }).ToList();
+        }
     }
 }

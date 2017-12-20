@@ -13,5 +13,7 @@ namespace Gateway.Services
         Task<List<OperationDetailModel>> GetOperationsDetailed();
         Task<List<OrderAdditionModel>> GetOrdersAdditions();
         Task<List<OrderAdditionDetailModel>> GetOrdersAdditionsDetailed();
+        Task<List<OrderValueModel>> GetOrderValues();
+        Task<List<OrderValueDetailModel>> GetOrderValuesDetailed();
     }
 }

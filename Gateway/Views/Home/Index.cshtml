@@ -1,12 +1,12 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-
+@model Gateway.Models.UserModel
 <h1>Главная страница EasyLogistics</h1>
 <hr/>
 <div class="row">
     <div class="col-md-3">
-        <form asp-controller="Home" asp-action="AddOrder" method="get">
+        <form asp-controller="Home" asp-action="AddOrder" method="get" asp-route-username="@Model.Username">
             <button type="submit" class="btn btn-success">Add order!</button>
         </form>
     </div>

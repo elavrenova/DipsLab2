@@ -85,7 +85,12 @@ namespace Gateway.Controllers
             var ordResp = await orderService.AddOrder(item);
             eventBus.Publish(new AddedOrderEvent
             {
-                User = "User"
+                User = item.Username
+            });
+            eventBus.Publish(new OrderValuesEvent
+            {
+                Author = item.Username,
+                Value = item.Value.ToString()
             });
             return StatusCode(200,msg);
         }

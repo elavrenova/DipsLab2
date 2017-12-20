@@ -1,17 +1,24 @@
 ﻿@{
     ViewData["Title"] = "Values statistics";
 }
-<dx-chart>
+@*<dx-chart>
     <datasource load-action="OrderValues" />
-    <common-series-settings argument-field="Value" value-field="Count" type="FullStackedBar" range-value1-field="0" range-value2-field="5000" />
+    <common-series-settings argument-field="Value" value-field="Count" type="FullStackedBar"  />
     <series-template name-field="Value" />
     <value-axis>
         <label format="Decimal" />
     </value-axis>
-    <title text="Orders value"></title>
+    <title text="Orders values"></title>
     <legend vertical-alignment="Bottom" horizontal-alignment="Center" />
     <tooltip enabled="true" />
-</dx-chart>
+</dx-chart>*@
+<dx-pie-chart>
+    <datasource load-action="OrderValues" />
+    <series argument-field="Count" value-field="Value">
+        <label visible="true" position="DevExtreme.AspNet.TagHelpers.PieChartLabelPosition.Outside" background-color="transparent" />
+    </series>
+    <title text="Orders Values"></title>
+</dx-pie-chart>
 <dx-data-grid>
     <datasource load-action="OrderValuesDetail" />
     <column datafield="Author" caption="User">

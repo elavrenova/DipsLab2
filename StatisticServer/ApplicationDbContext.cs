@@ -13,6 +13,7 @@ namespace StatisticServer
         public DbSet<RequestInfo> Requests { get; set; }
         public DbSet<OperationInfo> UserOperations { get; set; }
         public DbSet<AddOrderInfo> OrderAdditions { get; set; }
+        public DbSet<OrderValuesInfo> OrderValues { get; set; }
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
         }

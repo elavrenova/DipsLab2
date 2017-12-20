@@ -51,5 +51,20 @@ namespace Gateway.Services.Implementations
                 return JsonConvert.DeserializeObject<List<OrderAdditionDetailModel>>(res.Content.ReadAsStringAsync().Result);
             return null;
         }
+        public async Task<List<OrderValueModel>> GetOrderValues()
+        {
+            var res = await Get("ordervalues");
+            if (res.IsSuccessStatusCode)
+                return JsonConvert.DeserializeObject<List<OrderValueModel>>(res.Content.ReadAsStringAsync().Result);
+            return null;
+        }
+
+        public async Task<List<OrderValueDetailModel>> GetOrderValuesDetailed()
+        {
+            var res = await Get("ordervalues/detail");
+            if (res.IsSuccessStatusCode)
+                return JsonConvert.DeserializeObject<List<OrderValueDetailModel>>(res.Content.ReadAsStringAsync().Result);
+            return null;
+        }
     }
 }
