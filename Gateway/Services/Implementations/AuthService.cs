@@ -43,6 +43,19 @@ namespace Gateway.Services.Implementations
             }
              
         }
+        public async Task<string> GetRole(string token)
+        {
+            var resp = await Get($"account/getrole?token={token}");
+            try
+            {
+                return await resp.Content.ReadAsStringAsync();
+            }
+            catch
+            {
+                return null;
+            }
+
+        }
 
 
     }

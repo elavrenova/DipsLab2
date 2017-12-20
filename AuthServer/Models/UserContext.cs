@@ -19,9 +19,10 @@ namespace AuthServer.Models
         {
             if (!Users.Any())
             {
-                Users.Add(new User { Username = "User1", Password = "pass1".Sha256() });
-                Users.Add(new User { Username = "User2", Password = "pass2".Sha256() });
-                Users.Add(new User { Username = "User3", Password = "pass3".Sha256() });
+                Users.Add(new User { Username = "User1", Password = "pass1".Sha256(), Role="User" });
+                Users.Add(new User { Username = "User2", Password = "pass2".Sha256(), Role="User" });
+                Users.Add(new User { Username = "User3", Password = "pass3".Sha256(), Role="User" });
+                Users.Add(new User { Username = "Admin", Password = "admin".Sha256(), Role="Admin" });
                 SaveChanges();
             }
         }

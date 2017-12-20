@@ -5,20 +5,32 @@ using System.Threading.Tasks;
 using Gateway.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Server.Kestrel.Transport.Libuv.Internal.Networking;
+using StatisticServer.EventBus;
+using StatisticServer.Events;
 
 namespace Gateway.Authorisation
 {
     public class GatewayAuthorizationMiddleWare : AuthorizationMiddleWare
     {
         private IAuthService authService;
+        private RabbitMQEventBus eventBus;
 
-        public GatewayAuthorizationMiddleWare(RequestDelegate next, IAuthService authService) : base(next)
+        public GatewayAuthorizationMiddleWare(RequestDelegate next, IAuthService authService, RabbitMQEventBus eventBus) : base(next)
         {
+            this.eventBus = eventBus;
             this.authService = authService;
         }
 
         public override async Task Invoke(HttpContext context)
         {
+            eventBus.Publish(new RequestEvent
+            {
+                Host = context.Connection.LocalIpAddress.ToString() + ":" + context.Connection.LocalPort.ToString(),
+                Origin = context.Connection.RemoteIpAddress.ToString() + ":" + context.Connection.RemotePort.ToString(),
+                Route = context.Request.Path.ToString(),
+                RequestType = RequestType.Gateway,
+                OccurenceTime = DateTime.Now
+            }, true);
             if (context.Request.Headers.Keys.Contains(AuthorizationWord))
             {
                 await this._next(context);
@@ -47,6 +59,10 @@ namespace Gateway.Authorisation
         public override string GetUserByToken(string token)
         {
             return authService.VerifyToken(token)?.Result;
+        }
+        public override string GetRoleByToken(string token)
+        {
+            return authService.GetRole(token)?.Result;
         }
     }
 }

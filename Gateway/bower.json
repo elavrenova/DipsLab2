@@ -1,5 +1,8 @@
 {
   "name": "asp.net",
   "private": true,
-  "dependencies": {}
+  "dependencies": {
+    "devextreme": "17.2.4",
+    "devextreme-aspnet-data": "1.3.0"
+  }
 }

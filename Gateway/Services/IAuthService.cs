@@ -13,5 +13,6 @@ namespace Gateway.Services
         Task<HttpResponseMessage> Login(UserModel item);
         Task<HttpResponseMessage> LogOut(string token);
         Task<string> VerifyToken(string token);
+        Task<string> GetRole(string token);
     }
 }

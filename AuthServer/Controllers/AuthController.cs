@@ -61,7 +61,8 @@ namespace AuthServer.Controllers
                     {
                         Id = Guid.NewGuid().ToString(),
                         Expiration = DateTime.Now + TimeSpan.FromMinutes(30),
-                        Owner = userModel.Username
+                        Owner = userModel.Username,
+                        Role = user.Role
                     };
                     tokenDbContext.Add(token);
                     tokenDbContext.SaveChanges();
@@ -96,6 +97,12 @@ namespace AuthServer.Controllers
                 tokenDbContext.SaveChanges();
             }
             return Unauthorized();
+        }
+        [HttpGet("getrole")]
+        public async Task<IActionResult> GetRole(string token)
+        {
+            var tkn = tokenDbContext.Tokens.FirstOrDefault(x => x.Id == token);
+                    return Ok(tkn.Role);
         }
 
     }

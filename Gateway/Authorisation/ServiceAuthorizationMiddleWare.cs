@@ -78,5 +78,10 @@ namespace Gateway.Authorisation
         {
             return tokensStore.GetNameByToken(token);
         }
+
+        public override string GetRoleByToken(string token)
+        {
+            return "Role";
+        }
     }
 }

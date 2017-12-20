@@ -1,0 +1,21 @@
+﻿@{
+    ViewData["Title"] = "Values statistics";
+}
+<dx-chart>
+    <datasource load-action="OrderValues" />
+    <common-series-settings argument-field="Value" value-field="Count" type="FullStackedBar" range-value1-field="0" range-value2-field="5000" />
+    <series-template name-field="Value" />
+    <value-axis>
+        <label format="Decimal" />
+    </value-axis>
+    <title text="Orders value"></title>
+    <legend vertical-alignment="Bottom" horizontal-alignment="Center" />
+    <tooltip enabled="true" />
+</dx-chart>
+<dx-data-grid>
+    <datasource load-action="OrderValuesDetail" />
+    <column datafield="Author" caption="User">
+    </column>
+    <column datafield="Value" caption="Value">
+    </column>
+</dx-data-grid>

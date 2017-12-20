@@ -52,10 +52,16 @@ namespace Gateway.Authorisation
             {
                 var token = match.Groups[1].Value;
                 var result = GetUserByToken(token);
+
                 if (!string.IsNullOrWhiteSpace(result))
                 {
-                    context.Request.Headers.Add(UserWord, result);
-                    await this._next(context);
+                        ClaimsIdentity identity = new ClaimsIdentity(new List<Claim>
+                    {
+                        new Claim(UserWord, result),
+                        new Claim(RoleWord, GetRoleByToken(token))
+                    }, "CustomAuthenticationType");
+                        context.User.AddIdentity(identity);
+                        await this._next(context);
                 }
                 else
                 { 
@@ -69,5 +75,6 @@ namespace Gateway.Authorisation
         public abstract List<string> GetAnonymousPaths();
 
         public abstract string GetUserByToken(string token);
+        public abstract string GetRoleByToken(string token);
     }
 }

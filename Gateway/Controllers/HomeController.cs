@@ -14,6 +14,8 @@ using System.Threading.Tasks;
 using Gateway.Authorisation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using StatisticServer.EventBus;
+using StatisticServer.Events;
 
 namespace Gateway.Controllers
 {
@@ -24,15 +26,17 @@ namespace Gateway.Controllers
         private IStockService stockService;
         private ITransferService transferService;
         private IOrderService orderService;
+        private RabbitMQEventBus eventBus;
 
 
         public HomeController(AggregationController aggregationController, IStockService stockService,
-            ITransferService transferService, IOrderService orderService)
+            ITransferService transferService, IOrderService orderService, RabbitMQEventBus eventBus)
         {
             this.aggregationController = aggregationController;
             this.stockService = stockService;
             this.transferService = transferService;
             this.orderService = orderService;
+            this.eventBus = eventBus;
         }
 
         [HttpGet("order")]
@@ -56,6 +60,12 @@ namespace Gateway.Controllers
                 var resp = await aggregationController.AddNewOrder(item);
                 if (resp.StatusCode == 200)
                 {
+                    eventBus.Publish(new AddOrderEvent
+                    {
+                        Author = "User" + item.UserId.ToString(),
+                        Stock = "Stock" + item.StockId.ToString(),
+                        Value = item.Value.ToString()
+                    });
                     return RedirectToAction("CorrectlyAddedOrder");
                 }
                 return View("MyError", new ErrorModel(resp));
@@ -173,6 +183,10 @@ namespace Gateway.Controllers
                 ViewBag.stockList = stockList.ToList();
                 return View("InfoDegradation");
             }
+            eventBus.Publish(new GetInfoEvent
+            {
+
+            });
             ViewBag.stockList = stockList.ToList();
             ViewBag.transferList = transfList.ToList();
             return View();
@@ -189,6 +203,10 @@ namespace Gateway.Controllers
                 var resp = StatusCode(503, msg);
                 return View("MyError", new ErrorModel(resp));
             }
+            eventBus.Publish(new GetStocksEvent
+            {
+
+            });
             ViewBag.stockList = stockList.ToList();
             return View("InfoDegradation");
         }
@@ -212,6 +230,10 @@ namespace Gateway.Controllers
                 var resp = StatusCode(503, msg);
                 return View("MyError", new ErrorModel(resp));
             }
+            eventBus.Publish(new GetTransfersEvent
+            {
+                User = "User"
+            });
             ViewBag.transfList = transfList.ToList();
             return View("Transfers");   
         }

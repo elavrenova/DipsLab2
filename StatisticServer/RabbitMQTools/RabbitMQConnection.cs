@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Polly;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
@@ -16,6 +17,8 @@ namespace StatisticServer.RabbitMQTools
         private readonly IConnectionFactory connectionFactory;
         IConnection connection;
         bool disposed;
+        int retry = 2;
+        object sync_root = new object();
 
         public RabbitMQConnection(IConfiguration configuration)
         {
@@ -54,48 +57,45 @@ namespace StatisticServer.RabbitMQTools
             }
         }
 
-        //public bool TryConnect()
-        //{
-        //    lock (sync_root)
-        //    {
-        //        var policy = Policy.Handle<SocketException>()
-        //           .Or<BrokerUnreachableException>()
-        //           .WaitAndRetry(retryCount, retryAttempt => TimeSpan.FromSeconds(5), (ex, time) =>
-        //           {
-        //               logger.LogWarning($"{ex.Message}");
-        //           }
-        //        );
-        //        policy.Execute(() => connection = connectionFactory.CreateConnection());
-        //        if (IsConnected)
-        //        {
-        //            connection.ConnectionShutdown += OnConnectionShutdown;
-        //            connection.CallbackException += OnCallbackException;
-        //            connection.ConnectionBlocked += OnConnectionBlocked;
-        //            return true;
-        //        }
-        //        else
-        //        {
-        //            return false;
-        //        }
-        //    }
-        //}
+        public bool TryConnect()
+        {
+            lock (sync_root)
+            {
+                var policy = Policy.Handle<SocketException>()
+                   .Or<BrokerUnreachableException>()
+                   .WaitAndRetry(retry, retryAttempt => TimeSpan.FromSeconds(5), (ex, time) =>{}
+                );
+                policy.Execute(() => connection = connectionFactory.CreateConnection());
+                if (IsConnected)
+                {
+                    connection.ConnectionShutdown += OnConnectionShutdown;
+                    connection.CallbackException += OnCallbackException;
+                    connection.ConnectionBlocked += OnConnectionBlocked;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
 
-        //private void OnConnectionBlocked(object sender, ConnectionBlockedEventArgs e)
-        //{
-        //    if (disposed) return;
-        //    TryConnect();
-        //}
+        private void OnConnectionBlocked(object sender, ConnectionBlockedEventArgs e)
+        {
+            if (disposed) return;
+            TryConnect();
+        }
 
-        //void OnCallbackException(object sender, CallbackExceptionEventArgs e)
-        //{
-        //    if (disposed) return;
-        //    TryConnect();
-        //}
+        void OnCallbackException(object sender, CallbackExceptionEventArgs e)
+        {
+            if (disposed) return;
+            TryConnect();
+        }
 
-        //void OnConnectionShutdown(object sender, ShutdownEventArgs reason)
-        //{
-        //    if (disposed) return;
-        //    TryConnect();
-        //}
+        void OnConnectionShutdown(object sender, ShutdownEventArgs reason)
+        {
+            if (disposed) return;
+            TryConnect();
+        }
     }
 }

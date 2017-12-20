@@ -10,5 +10,6 @@ namespace AuthServer.Entities
         public string Id { get; set; }
         public string Owner { get; set; }
         public DateTime Expiration { get; set; }
+        public string Role { get; set; }
     }
 }

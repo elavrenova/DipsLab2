@@ -19,6 +19,7 @@ namespace StatisticServer
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .UseDefaultServiceProvider(ops => ops.ValidateScopes = false)
                 .UseStartup<Startup>()
                 .Build();
     }

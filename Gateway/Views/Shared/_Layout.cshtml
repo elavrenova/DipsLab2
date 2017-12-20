@@ -14,7 +14,17 @@
               asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
               asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
         <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
     </environment>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.17.0/dist/jquery.validate.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.6/jquery.validate.unobtrusive.js"></script>
+    <link href="~/lib/devextreme/css/dx.common.css" rel="stylesheet" />
+    <link href="~/lib/devextreme/css/dx.light.css" rel="stylesheet" />
+    <script src="~/lib/devextreme/js/dx.all.js"></script>
+    <script src="~/lib/devextreme-aspnet-data/js/dx.aspnet.data.js"></script>
+    <script src="~/lib/devextreme/js/dx.aspnet.mvc.js"></script>
 </head>
 <body>
 <nav class="navbar navbar-default navbar-fixed-top">
@@ -33,7 +43,16 @@
                     <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="GetStocks">Stocks</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="GetTransfers">Transfers</a></li>
-                    <li class="navbar-right"><a asp-area="" asp-controller="Users" asp-action="Logout">Log out</a></li>
+                </ul>
+                <ul class="nav navbar-nav">
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li><a asp-controller="Statistics" asp-action="RequestsStatistics">Requests statistics</a></li>
+                            <li><a asp-controller="Statistics" asp-action="OperationsStatistics">Operations statistics</a></li>
+                            <li><a asp-controller="Statistics" asp-action="AddOrderStatistics">Users statistics</a></li>
+                            <li><a asp-controller="Statistics" asp-action="OrderValueStatistics">Values statistics</a></li>
+                        }
+                        <li><a asp-controller="Users" asp-action="Logout">Logout</a></li>
                 </ul>
             </div>
         </div>

@@ -10,6 +10,8 @@ using Gateway.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using StatisticServer.EventBus;
+using StatisticServer.Events;
 
 namespace Gateway.Controllers
 {
@@ -19,20 +21,23 @@ namespace Gateway.Controllers
         private IStockService stockService;
         private ITransferService transferService;
         private ILogger<HomeController> logger;
+        private RabbitMQEventBus eventBus;
 
         public AggregationController(
             IOrderService orderService,
             IStockService stockService,
             ITransferService transferService,
-            ILogger<HomeController> logger)
+            ILogger<HomeController> logger,
+            RabbitMQEventBus eventBus)
         {
             this.orderService = orderService;
             this.stockService = stockService;
             this.transferService = transferService;
             this.logger = logger;
+            this.eventBus = eventBus;
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpPost("add_new_order")]
         public async Task<ObjectResult> AddNewOrder(StockTransferOrderModel item)
         {
@@ -78,10 +83,14 @@ namespace Gateway.Controllers
             item.TransferId = Int16.Parse(trId);
             item.Status += 1;
             var ordResp = await orderService.AddOrder(item);
+            eventBus.Publish(new AddedOrderEvent
+            {
+                User = "User"
+            });
             return StatusCode(200,msg);
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpPut("refuse_order")]
         public async Task<ObjectResult> RefuseOrder(StockTransferOrderModel item)
         {
@@ -142,6 +151,10 @@ namespace Gateway.Controllers
             }
             item.Status += 9;
             await orderService.RefuseOrder(item);
+            eventBus.Publish(new DeletedOrderEvent
+            {
+                User = "User"
+            });
             return StatusCode(200, msg);
         }
 
