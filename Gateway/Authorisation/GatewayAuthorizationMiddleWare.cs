@@ -23,7 +23,7 @@ namespace Gateway.Authorisation
 
         public override async Task Invoke(HttpContext context)
         {
-            eventBus.Publish(new RequestEvent
+            eventBus.PublishEvent(new RequestEvent
             {
                 Host = context.Connection.LocalIpAddress.ToString() + ":" + context.Connection.LocalPort.ToString(),
                 Origin = context.Connection.RemoteIpAddress.ToString() + ":" + context.Connection.RemotePort.ToString(),

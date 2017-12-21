@@ -59,12 +59,13 @@ namespace Gateway
             services.AddMvc().AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver()); ;
             services.AddSingleton<RabbitMQEventBus>();
             services.AddSingleton<EventsStorage>();
-            services.AddSingleton<AckHandler>();
+            services.AddSingleton<IEventsHandler,AckHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.ApplicationServices.GetServices<IEventsHandler>();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

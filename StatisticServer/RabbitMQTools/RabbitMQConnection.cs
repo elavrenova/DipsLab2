@@ -68,9 +68,21 @@ namespace StatisticServer.RabbitMQTools
                 policy.Execute(() => connection = connectionFactory.CreateConnection());
                 if (IsConnected)
                 {
-                    connection.ConnectionShutdown += OnConnectionShutdown;
-                    connection.CallbackException += OnCallbackException;
-                    connection.ConnectionBlocked += OnConnectionBlocked;
+                    connection.ConnectionShutdown += (sender, ea) =>
+                    {
+                        if (disposed) return;
+                        TryConnect();
+                    };
+                    connection.CallbackException += (sender, ea) =>
+                    {
+                        if (disposed) return;
+                        TryConnect();
+                    };
+                    connection.ConnectionBlocked += (sender, ea) =>
+                    {
+                        if (disposed) return;
+                        TryConnect();
+                    };
                     return true;
                 }
                 else
@@ -78,24 +90,6 @@ namespace StatisticServer.RabbitMQTools
                     return false;
                 }
             }
-        }
-
-        private void OnConnectionBlocked(object sender, ConnectionBlockedEventArgs e)
-        {
-            if (disposed) return;
-            TryConnect();
-        }
-
-        void OnCallbackException(object sender, CallbackExceptionEventArgs e)
-        {
-            if (disposed) return;
-            TryConnect();
-        }
-
-        void OnConnectionShutdown(object sender, ShutdownEventArgs reason)
-        {
-            if (disposed) return;
-            TryConnect();
         }
     }
 }

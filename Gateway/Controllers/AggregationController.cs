@@ -83,11 +83,11 @@ namespace Gateway.Controllers
             item.TransferId = Int16.Parse(trId);
             item.Status += 1;
             var ordResp = await orderService.AddOrder(item);
-            eventBus.Publish(new AddedOrderEvent
+            eventBus.PublishEvent(new AddedOrderEvent
             {
                 User = item.Username
             });
-            eventBus.Publish(new OrderValuesEvent
+            eventBus.PublishEvent(new OrderValuesEvent
             {
                 Author = item.Username,
                 Value = item.Value.ToString()
@@ -156,7 +156,7 @@ namespace Gateway.Controllers
             }
             item.Status += 9;
             await orderService.RefuseOrder(item);
-            eventBus.Publish(new DeletedOrderEvent
+            eventBus.PublishEvent(new DeletedOrderEvent
             {
                 User = "User"
             });

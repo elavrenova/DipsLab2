@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace StatisticServer.EventsHandlers
 {
-    interface IEventsHandler
+    public interface IEventsHandler
     {
     }
 

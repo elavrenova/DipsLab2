@@ -30,11 +30,11 @@ namespace StatisticServer.EventsHandlers
                     dbContext.UserOperations.Add(entity);
                     dbContext.SaveChanges();
                 }
-                eventBus.Publish(new AckEvent { AdjEventId = @event.Id, Status = AckStatus.Success });
+                eventBus.PublishEvent(new AckEvent { AdjEventId = @event.Id, Status = AckStatus.Success });
             }
             catch (Exception e)
             {
-                eventBus.Publish(new AckEvent { AdjEventId = @event.Id, Description = e.ToString(), Status = AckStatus.Failed });
+                eventBus.PublishEvent(new AckEvent { AdjEventId = @event.Id, Description = e.ToString(), Status = AckStatus.Failed });
             }
         }
     }

@@ -75,38 +75,32 @@ namespace StatisticServer.EventBus
             });
         }
 
-        public void Publish(Event @event, bool ack = false)
+        public void PublishEvent(Event @event, bool ack = false)
         {
             new Thread(o =>
             {
-                try
+                @event = o as Event;
+                if (ack)
                 {
-                    @event = o as Event;
-                    if (ack)
+                    int @try = 0;
+                    eventsStorage.AddEvent(@event);
+                    while (@try < retry)
                     {
-                        int @try = 0;
-                        eventsStorage.AddEvent(@event);
-                        while (@try < retry)
-                        {
-                            if ((@event = eventsStorage.GetEvent(@event.Id)) != null)
-                                PublishInner(@event);
-                            else
-                                return;
-                            Thread.Sleep(5000);
-                        }
-                    }
-                    else
-                    {
-                        PublishInner(@event);
+                        if ((@event = eventsStorage.GetEvent(@event.Id)) != null)
+                            PublishToQueue(@event);
+                        else
+                            return;
+                        Thread.Sleep(3000);
                     }
                 }
-                catch
+                else
                 {
+                    PublishToQueue(@event);
                 }
             }).Start(@event);
         }
 
-        private void PublishInner(Event @event)
+        private void PublishToQueue(Event @event)
         {
             if (!connection.IsConnected)
                 connection.TryConnect();
@@ -127,13 +121,16 @@ namespace StatisticServer.EventBus
 
         public void Subscribe<T>(EventsHandlers.EventHandler<T> eventHandler) where T : Event
         {
-            if (!connection.IsConnected)
-                connection.TryConnect();
-
             var name = typeof(T).FullName;
 
+            if (!connection.IsConnected)
+            {
+                connection.TryConnect();
+            }
             if (handlers.ContainsKey(name))
+            {
                 handlers[name].Add(eventHandler);
+            }  
             else
             {
                 policy.Execute(() =>
@@ -151,11 +148,10 @@ namespace StatisticServer.EventBus
 
         public void Unsubscribe<T>(EventsHandlers.EventHandler<T> eventHandler) where T : Event
         {
-            if (!connection.IsConnected)
-                connection.TryConnect();
-
             var name = typeof(T).FullName;
 
+            if (!connection.IsConnected)
+                connection.TryConnect();
             if (handlers.ContainsKey(name) && handlers[name].Contains(eventHandler))
                 handlers[name].Remove(eventHandler);
         }

@@ -60,7 +60,7 @@ namespace Gateway.Controllers
                 var resp = await aggregationController.AddNewOrder(item);
                 if (resp.StatusCode == 200)
                 {
-                    eventBus.Publish(new AddOrderEvent
+                    eventBus.PublishEvent(new AddOrderEvent
                     {
                         Author = item.Username,
                         Stock = "Stock" + item.StockId.ToString(),
@@ -80,8 +80,8 @@ namespace Gateway.Controllers
             return View();
         }
 
-        [HttpGet("refuse")]
-        public async Task<IActionResult> RefuseOrder()
+        [HttpGet("refuse/{username}")]
+        public async Task<IActionResult> RefuseOrder(string username)
         {
             var stockList = await stockService.GetStocks();
             ViewBag.stockList = new SelectList(stockList, "Id", "Name");
@@ -183,9 +183,9 @@ namespace Gateway.Controllers
                 ViewBag.stockList = stockList.ToList();
                 return View("InfoDegradation");
             }
-            eventBus.Publish(new GetInfoEvent
+            eventBus.PublishEvent(new GetInfoEvent
             {
-
+                User = "User"
             });
             ViewBag.stockList = stockList.ToList();
             ViewBag.transferList = transfList.ToList();
@@ -203,9 +203,9 @@ namespace Gateway.Controllers
                 var resp = StatusCode(503, msg);
                 return View("MyError", new ErrorModel(resp));
             }
-            eventBus.Publish(new GetStocksEvent
+            eventBus.PublishEvent(new GetStocksEvent
             {
-
+                User = "User"
             });
             ViewBag.stockList = stockList.ToList();
             return View("InfoDegradation");
@@ -230,7 +230,7 @@ namespace Gateway.Controllers
                 var resp = StatusCode(503, msg);
                 return View("MyError", new ErrorModel(resp));
             }
-            eventBus.Publish(new GetTransfersEvent
+            eventBus.PublishEvent(new GetTransfersEvent
             {
                 User = "User"
             });
